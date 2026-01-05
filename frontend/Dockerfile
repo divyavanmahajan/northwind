@@ -1,8 +1,13 @@
-FROM node:20-slim
+FROM node:20-alpine
 
 WORKDIR /app
 
-# We'll install dependencies in the next steps
-# For now, just a placeholder
+COPY package*.json ./
 
-CMD ["npm", "run", "dev", "--", "--host"]
+RUN npm install
+
+COPY . .
+
+EXPOSE 5173
+
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
