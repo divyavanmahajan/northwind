@@ -10,6 +10,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./backend/data/northwind-docker.sql:/docker-entrypoint-initdb.d/01-northwind.sql:ro
     ports:
       - "5432:5432"
     healthcheck:

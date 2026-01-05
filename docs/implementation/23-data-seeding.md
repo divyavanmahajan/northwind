@@ -1,281 +1,134 @@
 # Prompt 23: Data Seeding Scripts
 
 ## Context
-Beginning Phase 5: Advanced Features. Before building dashboards, we need to seed the database with Northwind data.
+Beginning Phase 5: Advanced Features. The database is seeded with Northwind data automatically via Docker.
 
 ## Prerequisites
 - All entity models created (Prompts 11-22)
-- Migration for all tables complete
+- Docker containers running
 
 ## Goals
-1. Create seed data files from Northwind
-2. Build seed script with proper order
-3. Create sample users for each role
-4. Link users to customers/employees
-5. Verify data integrity
+1. Understand the SQL-based seeding approach
+2. Create sample users for each role
+3. Link users to customers/employees
+4. Verify data integrity
+
+---
+
+## Data Source
+
+The Northwind database seed data comes from an official SQL script:
+
+**Source URL:** https://github.com/harryho/db-samples/blob/2050c61088775c101c48b9747a2e4eb96a201ad2/pgsql/northwind.sql
+
+**Local Path:** `backend/data/northwind.sql`
+
+### Database Schema (from SQL script)
+
+The SQL script creates the following tables with their naming conventions:
+
+| Table Name | Description | Row Count |
+|------------|-------------|-----------|
+| Category | Product categories | 8 |
+| Supplier | Product suppliers | 29 |
+| Product | Products catalog | 77 |
+| Customer | Customer companies | 91 |
+| Employee | Company employees | 9 |
+| Shipper | Shipping companies | 3 |
+| SalesOrder | Customer orders | 830+ |
+| OrderDetail | Order line items | 2155+ |
+| Region | Geographic regions | 4 |
+| Territory | Sales territories | 53 |
+| EmployeeTerritory | Employee-territory assignments | - |
+| CustomerDemographic | Customer demographics | - |
+| CustomerCustomerDemographic | Customer-demographic mapping | - |
+
+### Key Column Naming Notes
+
+The SQL script uses these naming conventions (different from typical SQLAlchemy conventions):
+
+- **Customer ID:** `custid` (not `customer_id`)
+- **Employee ID:** `empid` (not `employee_id`)
+- **Order ID:** `orderid` (not `order_id`)
+- **Product ID:** `productid` (not `product_id`)
+- **Category ID:** `categoryid` (not `category_id`)
+- **Supplier ID:** `supplierid` (not `supplier_id`)
+- **Shipper ID:** `shipperid` (not `shipper_id`)
+- **Manager ID:** `mgrid` (not `reports_to`)
 
 ---
 
 ## Prompt
 
 ```text
-Create comprehensive data seeding scripts for the Northwind database.
+Configure data seeding for the Northwind database.
 
-DATA FILES (backend/data/):
-Create or obtain CSV files for standard Northwind data:
-- categories.csv (8 rows)
-- suppliers.csv (29 rows)
-- products.csv (77 rows)
-- customers.csv (91 rows)
-- employees.csv (9 rows)
-- shippers.csv (3 rows)
-- orders.csv (830 rows)
-- order_details.csv (2155 rows)
+AUTOMATIC SEEDING VIA DOCKER:
+The docker-compose.yml mounts the SQL file to PostgreSQL's initialization directory:
+  volumes:
+    - ./backend/data/northwind.sql:/docker-entrypoint-initdb.d/01-northwind.sql:ro
 
-SEED SCRIPT (backend/scripts/seed_database.py):
+PostgreSQL automatically executes scripts in /docker-entrypoint-initdb.d/ on first 
+container startup (when the data volume is empty).
+
+To re-seed the database:
+1. Stop containers: docker-compose down
+2. Remove the volume: docker volume rm northwind-test_postgres_data
+3. Start containers: docker-compose up -d
+
+SQLALCHEMY MODEL MAPPING:
+Your SQLAlchemy models should map to the existing table and column names.
+Example for Customer model:
+
+```python
+from sqlalchemy import Column, Integer, String
+from app.database import Base
+
+class Customer(Base):
+    __tablename__ = "customer"  # Matches SQL table name
+    
+    custid = Column("custid", Integer, primary_key=True)
+    companyname = Column("companyname", String(40), nullable=False)
+    contactname = Column("contactname", String(30))
+    contacttitle = Column("contacttitle", String(30))
+    address = Column("address", String(60))
+    city = Column("city", String(15))
+    region = Column("region", String(15))
+    postalcode = Column("postalcode", String(10))
+    country = Column("country", String(15))
+    phone = Column("phone", String(24))
+    fax = Column("fax", String(24))
+    
+    # Add property for consistent API naming
+    @property
+    def customer_id(self):
+        return self.custid
+```
+
+USER SEED SCRIPT (backend/scripts/seed_users.py):
+Since the Northwind SQL only includes business data (not application users),
+create a separate script for seeding users:
+
 ```python
 #!/usr/bin/env python
-\"\"\"
-Seed the Northwind database with sample data.
+"""
+Seed sample users for the Northwind application.
 
 Usage:
-    python scripts/seed_database.py          # Normal seed (skip if data exists)
-    python scripts/seed_database.py --force  # Force re-seed (clears data first)
-    python scripts/seed_database.py --users-only  # Create sample users only
-\"\"\"
+    python scripts/seed_users.py          # Create sample users
+    python scripts/seed_users.py --force  # Force re-create users
+"""
 import argparse
-import csv
-import os
-from pathlib import Path
-from datetime import datetime
-from decimal import Decimal
+from sqlalchemy import text
 
-from app.database import SessionLocal, engine, Base
-from app.models import *
+from app.database import SessionLocal
 from app.services.user_service import UserService
 from app.schemas.user import UserCreate
 from app.models.user import UserRole
 
-DATA_DIR = Path(__file__).parent.parent / "data"
 
-
-def load_csv(filename: str) -> list[dict]:
-    \"\"\"Load data from CSV file.\"\"\"
-    filepath = DATA_DIR / filename
-    if not filepath.exists():
-        print(f"Warning: {filename} not found")
-        return []
-    
-    with open(filepath, 'r', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        return list(reader)
-
-
-def seed_categories(db):
-    \"\"\"Seed categories table.\"\"\"
-    if db.query(Category).count() > 0:
-        print("Categories already seeded, skipping...")
-        return
-    
-    data = load_csv("categories.csv")
-    for row in data:
-        category = Category(
-            category_id=int(row['category_id']),
-            category_name=row['category_name'],
-            description=row.get('description', '')
-        )
-        db.add(category)
-    
-    db.commit()
-    print(f"Seeded {len(data)} categories")
-
-
-def seed_suppliers(db):
-    \"\"\"Seed suppliers table.\"\"\"
-    if db.query(Supplier).count() > 0:
-        print("Suppliers already seeded, skipping...")
-        return
-    
-    data = load_csv("suppliers.csv")
-    for row in data:
-        supplier = Supplier(
-            supplier_id=int(row['supplier_id']),
-            company_name=row['company_name'],
-            contact_name=row.get('contact_name'),
-            contact_title=row.get('contact_title'),
-            address=row.get('address'),
-            city=row.get('city'),
-            region=row.get('region'),
-            postal_code=row.get('postal_code'),
-            country=row.get('country'),
-            phone=row.get('phone'),
-            fax=row.get('fax'),
-            homepage=row.get('homepage')
-        )
-        db.add(supplier)
-    
-    db.commit()
-    print(f"Seeded {len(data)} suppliers")
-
-
-def seed_products(db):
-    \"\"\"Seed products table.\"\"\"
-    if db.query(Product).count() > 0:
-        print("Products already seeded, skipping...")
-        return
-    
-    data = load_csv("products.csv")
-    for row in data:
-        product = Product(
-            product_id=int(row['product_id']),
-            product_name=row['product_name'],
-            supplier_id=int(row['supplier_id']) if row.get('supplier_id') else None,
-            category_id=int(row['category_id']) if row.get('category_id') else None,
-            quantity_per_unit=row.get('quantity_per_unit'),
-            unit_price=Decimal(row['unit_price']) if row.get('unit_price') else None,
-            units_in_stock=int(row['units_in_stock']) if row.get('units_in_stock') else 0,
-            units_on_order=int(row['units_on_order']) if row.get('units_on_order') else 0,
-            reorder_level=int(row['reorder_level']) if row.get('reorder_level') else 0,
-            discontinued=row.get('discontinued', '0') == '1'
-        )
-        db.add(product)
-    
-    db.commit()
-    print(f"Seeded {len(data)} products")
-
-
-def seed_customers(db):
-    \"\"\"Seed customers table.\"\"\"
-    if db.query(Customer).count() > 0:
-        print("Customers already seeded, skipping...")
-        return
-    
-    data = load_csv("customers.csv")
-    for row in data:
-        customer = Customer(
-            customer_id=row['customer_id'],
-            company_name=row['company_name'],
-            contact_name=row.get('contact_name'),
-            contact_title=row.get('contact_title'),
-            address=row.get('address'),
-            city=row.get('city'),
-            region=row.get('region'),
-            postal_code=row.get('postal_code'),
-            country=row.get('country'),
-            phone=row.get('phone'),
-            fax=row.get('fax')
-        )
-        db.add(customer)
-    
-    db.commit()
-    print(f"Seeded {len(data)} customers")
-
-
-def seed_employees(db):
-    \"\"\"Seed employees table.\"\"\"
-    if db.query(Employee).count() > 0:
-        print("Employees already seeded, skipping...")
-        return
-    
-    data = load_csv("employees.csv")
-    for row in data:
-        employee = Employee(
-            employee_id=int(row['employee_id']),
-            last_name=row['last_name'],
-            first_name=row['first_name'],
-            title=row.get('title'),
-            title_of_courtesy=row.get('title_of_courtesy'),
-            birth_date=parse_date(row.get('birth_date')),
-            hire_date=parse_date(row.get('hire_date')),
-            address=row.get('address'),
-            city=row.get('city'),
-            region=row.get('region'),
-            postal_code=row.get('postal_code'),
-            country=row.get('country'),
-            home_phone=row.get('home_phone'),
-            extension=row.get('extension'),
-            notes=row.get('notes'),
-            reports_to=int(row['reports_to']) if row.get('reports_to') else None
-        )
-        db.add(employee)
-    
-    db.commit()
-    print(f"Seeded {len(data)} employees")
-
-
-def seed_shippers(db):
-    \"\"\"Seed shippers table.\"\"\"
-    if db.query(Shipper).count() > 0:
-        print("Shippers already seeded, skipping...")
-        return
-    
-    data = load_csv("shippers.csv")
-    for row in data:
-        shipper = Shipper(
-            shipper_id=int(row['shipper_id']),
-            company_name=row['company_name'],
-            phone=row.get('phone')
-        )
-        db.add(shipper)
-    
-    db.commit()
-    print(f"Seeded {len(data)} shippers")
-
-
-def seed_orders(db):
-    \"\"\"Seed orders table.\"\"\"
-    if db.query(Order).count() > 0:
-        print("Orders already seeded, skipping...")
-        return
-    
-    data = load_csv("orders.csv")
-    for row in data:
-        order = Order(
-            order_id=int(row['order_id']),
-            customer_id=row.get('customer_id'),
-            employee_id=int(row['employee_id']) if row.get('employee_id') else None,
-            order_date=parse_date(row.get('order_date')),
-            required_date=parse_date(row.get('required_date')),
-            shipped_date=parse_date(row.get('shipped_date')),
-            ship_via=int(row['ship_via']) if row.get('ship_via') else None,
-            freight=Decimal(row['freight']) if row.get('freight') else Decimal(0),
-            ship_name=row.get('ship_name'),
-            ship_address=row.get('ship_address'),
-            ship_city=row.get('ship_city'),
-            ship_region=row.get('ship_region'),
-            ship_postal_code=row.get('ship_postal_code'),
-            ship_country=row.get('ship_country'),
-            status='delivered'  # Historical orders are delivered
-        )
-        db.add(order)
-    
-    db.commit()
-    print(f"Seeded {len(data)} orders")
-
-
-def seed_order_details(db):
-    \"\"\"Seed order_details table.\"\"\"
-    if db.query(OrderDetail).count() > 0:
-        print("Order details already seeded, skipping...")
-        return
-    
-    data = load_csv("order_details.csv")
-    for row in data:
-        detail = OrderDetail(
-            order_id=int(row['order_id']),
-            product_id=int(row['product_id']),
-            unit_price=Decimal(row['unit_price']),
-            quantity=int(row['quantity']),
-            discount=Decimal(row['discount'])
-        )
-        db.add(detail)
-    
-    db.commit()
-    print(f"Seeded {len(data)} order details")
-
-
-def seed_users(db):
-    \"\"\"Create sample users for each role.\"\"\"
+def seed_users(db, force=False):
+    """Create sample users for each role."""
     service = UserService(db)
     
     users_to_create = [
@@ -284,115 +137,83 @@ def seed_users(db):
         {"username": "employee", "email": "employee@northwind.com", "password": "Employee123!", "role": UserRole.EMPLOYEE},
     ]
     
-    # Create customer users linked to first 5 customers
-    customers = db.query(Customer).limit(5).all()
-    for i, customer in enumerate(customers, 1):
+    # Get first 5 customers from the database
+    result = db.execute(text("SELECT custid, companyname FROM customer LIMIT 5"))
+    customers = result.fetchall()
+    
+    for i, (custid, companyname) in enumerate(customers, 1):
         users_to_create.append({
             "username": f"customer{i}",
             "email": f"customer{i}@example.com",
             "password": "Customer123!",
             "role": UserRole.CUSTOMER,
-            "link_customer": customer.customer_id
+            "link_customer_id": custid
         })
     
     for user_data in users_to_create:
-        link_customer = user_data.pop("link_customer", None)
+        link_customer_id = user_data.pop("link_customer_id", None)
         
-        # Check if user exists
-        if service.get_by_username(user_data["username"]):
-            print(f"User {user_data['username']} already exists, skipping...")
-            continue
+        existing = service.get_by_username(user_data["username"])
+        if existing:
+            if force:
+                service.delete(existing.user_id)
+                print(f"Deleted existing user: {user_data['username']}")
+            else:
+                print(f"User {user_data['username']} already exists, skipping...")
+                continue
         
         user = service.create(UserCreate(**user_data))
         print(f"Created user: {user.username} ({user.role.value})")
         
-        # Link to customer if specified
-        if link_customer:
-            customer = db.query(Customer).filter(Customer.customer_id == link_customer).first()
-            if customer:
-                customer.user_id = user.user_id
-                db.commit()
-                print(f"  -> Linked to customer {link_customer}")
-    
-    # Link employee user to first employee
-    employee_user = service.get_by_username("employee")
-    if employee_user:
-        first_employee = db.query(Employee).first()
-        if first_employee and not first_employee.user_id:
-            first_employee.user_id = employee_user.user_id
+        if link_customer_id:
+            db.execute(
+                text("UPDATE customer SET user_id = :user_id WHERE custid = :custid"),
+                {"user_id": user.user_id, "custid": link_customer_id}
+            )
             db.commit()
-            print(f"Linked employee user to {first_employee.full_name}")
-
-
-def parse_date(date_str):
-    \"\"\"Parse date string from CSV.\"\"\"
-    if not date_str:
-        return None
-    for fmt in ('%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y'):
-        try:
-            return datetime.strptime(date_str, fmt).date()
-        except ValueError:
-            continue
-    return None
-
-
-def clear_all_data(db):
-    \"\"\"Clear all data from tables in correct order.\"\"\"
-    print("Clearing all data...")
-    db.query(OrderDetail).delete()
-    db.query(Order).delete()
-    db.query(Product).delete()
-    db.query(Customer).delete()
-    db.query(Employee).delete()
-    db.query(Shipper).delete()
-    db.query(Supplier).delete()
-    db.query(Category).delete()
-    db.query(User).delete()
-    db.commit()
-    print("All data cleared")
+            print(f"  -> Linked to customer {link_customer_id}")
 
 
 def verify_data(db):
-    \"\"\"Verify seeded data.\"\"\"
+    """Verify seeded data counts."""
     print("\n=== Data Verification ===")
-    print(f"Categories: {db.query(Category).count()}")
-    print(f"Suppliers: {db.query(Supplier).count()}")
-    print(f"Products: {db.query(Product).count()}")
-    print(f"Customers: {db.query(Customer).count()}")
-    print(f"Employees: {db.query(Employee).count()}")
-    print(f"Shippers: {db.query(Shipper).count()}")
-    print(f"Orders: {db.query(Order).count()}")
-    print(f"Order Details: {db.query(OrderDetail).count()}")
-    print(f"Users: {db.query(User).count()}")
+    
+    tables = [
+        ("category", "Categories"),
+        ("supplier", "Suppliers"),
+        ("product", "Products"),
+        ("customer", "Customers"),
+        ("employee", "Employees"),
+        ("shipper", "Shippers"),
+        ("salesorder", "Orders"),
+        ("orderdetail", "Order Details"),
+    ]
+    
+    for table, label in tables:
+        result = db.execute(text(f"SELECT COUNT(*) FROM {table}"))
+        count = result.scalar()
+        print(f"{label}: {count}")
+    
+    # Check users table if it exists
+    try:
+        result = db.execute(text("SELECT COUNT(*) FROM users"))
+        count = result.scalar()
+        print(f"Users: {count}")
+    except Exception:
+        print("Users: (table not yet created)")
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Seed Northwind database')
-    parser.add_argument('--force', action='store_true', help='Force re-seed')
-    parser.add_argument('--users-only', action='store_true', help='Seed users only')
+    parser = argparse.ArgumentParser(description='Seed Northwind users')
+    parser.add_argument('--force', action='store_true', help='Force re-create users')
     args = parser.parse_args()
     
     db = SessionLocal()
     
     try:
-        if args.force:
-            clear_all_data(db)
-        
-        if not args.users_only:
-            # Seed in order of dependencies
-            seed_categories(db)
-            seed_suppliers(db)
-            seed_shippers(db)
-            seed_products(db)
-            seed_customers(db)
-            seed_employees(db)
-            seed_orders(db)
-            seed_order_details(db)
-        
-        seed_users(db)
+        seed_users(db, force=args.force)
         verify_data(db)
-        
-        print("\n✅ Database seeding complete!")
+        print("\n✅ User seeding complete!")
     except Exception as e:
         print(f"Error: {e}")
         db.rollback()
@@ -406,19 +227,52 @@ if __name__ == "__main__":
 ```
 
 VERIFICATION:
-1. Obtain Northwind CSV files (from public sources)
-2. Run: docker-compose exec backend python scripts/seed_database.py
-3. Verify counts match expected
-4. Test login with each sample user
-5. Verify customer users see only their orders
+1. Start fresh containers: 
+   docker-compose down && docker volume rm northwind-test_postgres_data && docker-compose up -d
+
+2. Check the database tables:
+   docker-compose exec db psql -U postgres -d northwind -c "\dt"
+
+3. Verify data counts:
+   docker-compose exec db psql -U postgres -d northwind -c "SELECT 'Categories' as table_name, COUNT(*) FROM category UNION ALL SELECT 'Suppliers', COUNT(*) FROM supplier UNION ALL SELECT 'Products', COUNT(*) FROM product UNION ALL SELECT 'Customers', COUNT(*) FROM customer UNION ALL SELECT 'Employees', COUNT(*) FROM employee UNION ALL SELECT 'Orders', COUNT(*) FROM salesorder;"
+
+4. Run user seeding (after implementing the users model):
+   docker-compose exec backend python scripts/seed_users.py
 
 SUCCESS CRITERIA:
-- All Northwind data seeded
-- Sample users created for each role
-- Customer users linked to customers
-- Employee user linked to employee
-- Data integrity verified
+- All Northwind tables created with data
+- Categories: 8 rows
+- Suppliers: 29 rows
+- Products: 77 rows
+- Customers: 91 rows
+- Employees: 9 rows
+- Orders: 830+ rows
+- Sample users created for each role (after user implementation)
 ```
+
+---
+
+## Expected File Structure
+
+```
+backend/
+├── data/
+│   ├── northwind.sql          # Full Northwind SQL (schema + data)
+│   └── northwind-seed.sql     # Schema-only reference
+├── scripts/
+│   └── seed_users.py          # User seeding script
+```
+
+---
+
+## Verification Checklist
+
+- [ ] Docker volume mounts SQL file correctly
+- [ ] PostgreSQL initializes with Northwind data on first startup
+- [ ] All tables created with correct schema
+- [ ] Data counts match expected values
+- [ ] SQLAlchemy models map to existing tables
+- [ ] User seeding script creates sample users
 
 ---
 

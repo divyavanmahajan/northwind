@@ -93,9 +93,20 @@ VERIFICATION:
 3. Visit http://localhost:8000 - should see JSON response
 4. Run: docker-compose exec backend alembic current - should show current revision
 
+NOTE ON PRE-SEEDED DATA:
+The database is automatically seeded with Northwind data on first startup via:
+  backend/data/northwind-docker.sql
+  
+This SQL file is sourced from:
+  https://github.com/harryho/db-samples/blob/2050c61088775c101c48b9747a2e4eb96a201ad2/pgsql/northwind.sql
+
+Check data was seeded:
+  docker-compose exec db psql -U postgres -d northwind -c "\dt"
+
 SUCCESS CRITERIA:
 - FastAPI app starts without errors
 - Database connection established
+- Northwind tables created and seeded with data
 - Alembic initialized and can run migrations
 - Basic tests pass: docker-compose exec backend pytest tests/unit/test_database.py
 ```

@@ -35,6 +35,29 @@ A modern web application based on the classic Northwind database, built with Fas
 
 ## Development
 
+### Database
+
+The database is automatically seeded with Northwind sample data on first startup. The seed data comes from:
+- **Source**: https://github.com/harryho/db-samples/blob/2050c61088775c101c48b9747a2e4eb96a201ad2/pgsql/northwind.sql
+- **Local file**: `backend/data/northwind-docker.sql`
+
+**Included data:**
+- 8 Categories
+- 29 Suppliers
+- 77 Products
+- 91 Customers
+- 9 Employees
+- 3 Shippers
+- 830 Orders
+- 2,155 Order Details
+
+**To reset the database with fresh data:**
+```bash
+docker-compose down
+docker volume rm northwind-test_postgres_data
+docker-compose up -d
+```
+
 ### Backend
 
 The backend is mounted as a volume, so changes to `backend/app` will trigger a reload.
