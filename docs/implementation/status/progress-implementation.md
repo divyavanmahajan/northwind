@@ -8,5 +8,7 @@
 | 04 | Frontend Scaffold | Completed |
 | 05 | Frontend-Backend Integration | Completed |
 | 06 | User Model & Password Security | Completed |
+| 07 | JWT Authentication Endpoints | Completed |
+| 08 | Auth Middleware & Protected Routes | In Progress |
 | 23 | Data Seeding | Configured (using official Northwind SQL) |
 | ... | ... | ... |

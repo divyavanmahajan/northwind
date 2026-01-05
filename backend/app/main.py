@@ -10,7 +10,7 @@ import logging
 
 from .config import settings
 from .database import engine
-from .routers import health
+from .routers import health, auth
 from .middleware.logging import RequestLoggingMiddleware
 from .utils.exceptions import AppException
 from .schemas.common import ErrorResponse, ErrorDetail
@@ -132,5 +132,6 @@ async def generic_exception_handler(request: Request, exc: Exception):
 from fastapi import APIRouter
 api_router = APIRouter(prefix="/api/v1")
 api_router.include_router(health.router)
+api_router.include_router(auth.router)
 
 app.include_router(api_router)
