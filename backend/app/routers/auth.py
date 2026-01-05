@@ -5,6 +5,9 @@ from app.schemas.auth import LoginRequest, LoginResponse
 from app.schemas.user import UserResponse
 from app.auth.service import AuthService
 from app.utils.exceptions import AuthenticationError
+from app.auth.dependencies import get_current_user
+from app.auth.permissions import get_permissions
+from app.models.user import User
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -33,6 +36,28 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
         expires_in=tokens["expires_in"],
         user=UserResponse.model_validate(user)
     )
+
+@router.get("/me", response_model=UserResponse)
+def get_me(current_user: User = Depends(get_current_user)):
+    """
+    Get current authenticated user's information.
+    
+    Requires valid JWT token in Authorization header.
+    """
+    return UserResponse.model_validate(current_user)
+
+@router.get("/me/permissions")
+def get_my_permissions(current_user: User = Depends(get_current_user)):
+    """
+    Get current user's permissions.
+    """
+    permissions = get_permissions(current_user.role)
+    return {
+        "user_id": str(current_user.user_id),
+        "username": current_user.username,
+        "role": current_user.role.value,
+        "permissions": [p.value for p in permissions]
+    }
 
 @router.post("/logout")
 def logout():
