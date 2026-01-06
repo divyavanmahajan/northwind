@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, field_validator, ConfigDict
+from pydantic import BaseModel, EmailStr, field_validator, ConfigDict, Field
 from uuid import UUID
 from datetime import datetime
 from typing import Optional
@@ -70,3 +70,28 @@ class UserInToken(BaseModel):
     user_id: UUID
     username: str
     role: UserRole
+
+# Schema for user list (lighter response)
+class UserListResponse(BaseModel):
+    user_id: UUID
+    username: str
+    email: str
+    role: UserRole
+    is_active: bool
+    last_login: Optional[datetime] = None
+    created_at: datetime
+    
+    model_config = ConfigDict(from_attributes=True)
+
+# Schema for password reset (admin)
+class PasswordReset(BaseModel):
+    new_password: str = Field(..., min_length=8)
+    
+    @field_validator('new_password')
+    @classmethod
+    def password_valid(cls, v: str) -> str:
+        from app.utils.password import PasswordValidator
+        is_valid, errors = PasswordValidator.validate(v)
+        if not is_valid:
+            raise ValueError('; '.join(errors))
+        return v
