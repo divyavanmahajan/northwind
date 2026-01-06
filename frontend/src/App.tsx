@@ -16,8 +16,10 @@ import { Categories } from '@/pages/Categories';
 import { Suppliers } from '@/pages/Suppliers';
 import { SupplierDetail } from '@/pages/SupplierDetail';
 import { SupplierFormPage } from '@/pages/SupplierFormPage';
+import { Products } from '@/pages/Products';
+import { ProductDetail } from '@/pages/ProductDetail';
+import { ProductFormPage } from '@/pages/ProductFormPage';
 
-const Products = () => <div className="p-8">Products (Coming Soon)</div>;
 const Orders = () => <div className="p-8">Orders (Coming Soon)</div>;
 const Customers = () => <div className="p-8">Customers (Coming Soon)</div>;
 const Employees = () => <div className="p-8">Employees (Coming Soon)</div>;
@@ -51,6 +53,30 @@ function App() {
               <Route index element={<Navigate to="/dashboard" replace />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="products" element={<Products />} />
+              <Route
+                path="products/new"
+                element={
+                  <ProtectedRoute roles={['admin', 'manager']}>
+                    <ProductFormPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="products/:id"
+                element={
+                  <ProtectedRoute roles={['admin', 'manager', 'employee']}>
+                    <ProductDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="products/:id/edit"
+                element={
+                  <ProtectedRoute roles={['admin', 'manager']}>
+                    <ProductFormPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="categories" element={<Categories />} />
               <Route path="orders" element={<Orders />} />
 

@@ -17,5 +17,7 @@
 | 13 | Suppliers CRUD (Backend) | Completed |
 | 14 | Suppliers UI Components | Completed |
 | 15 | Products CRUD with Relationships (Backend) | Completed |
+| 16 | Products UI with Search, Filter, Sort, Pagination | Completed |
+| 17 | Customers CRUD (Backend) | Pending |
 | 23 | Data Seeding | Configured (using official Northwind SQL) |
 | ... | ... | ... |
