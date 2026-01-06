@@ -1,4 +1,4 @@
-import api from './api';
+import api from '@/lib/api';
 import type { UserListItem, User, UserCreate, UserUpdate, PasswordReset } from '@/types/user';
 import type { PaginatedResponse } from '@/types/api';
 

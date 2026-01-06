@@ -55,6 +55,7 @@ class AdminDashboard(BaseModel):
     revenue_trend: List[RevenueByPeriod]
     orders_by_status: List[OrdersByStatus]
     top_products: List[TopProduct]
+    top_customers: List[TopCustomer]
     low_stock_alerts: List[LowStockProduct]
 
 class ManagerDashboard(BaseModel):

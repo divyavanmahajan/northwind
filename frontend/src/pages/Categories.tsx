@@ -168,6 +168,7 @@ export function Categories() {
                                         handleOpenEdit(cat);
                                     }}
                                     className="h-8 w-8 hover:text-primary"
+                                    data-testid={`edit-category-${cat.category_id}`}
                                 >
                                     <Pencil className="h-4 w-4" />
                                 </Button>
@@ -179,6 +180,7 @@ export function Categories() {
                                         setDeletingCategory(cat);
                                     }}
                                     className="h-8 w-8 hover:text-destructive hover:bg-destructive/10"
+                                    data-testid={`delete-category-${cat.category_id}`}
                                 >
                                     <Trash2 className="h-4 w-4" />
                                 </Button>

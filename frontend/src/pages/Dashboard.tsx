@@ -44,29 +44,44 @@ export const Dashboard = () => {
     );
   }
 
-  if (dashboardQuery.isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  const renderContent = () => {
+    if (dashboardQuery.isLoading) {
+      return (
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      );
+    }
 
-  if (dashboardQuery.isError) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-destructive">Error loading dashboard. Please try again.</p>
-      </div>
-    );
-  }
+    if (dashboardQuery.isError) {
+      return (
+        <div className="flex items-center justify-center h-64">
+          <p className="text-destructive">Error loading dashboard. Please try again.</p>
+        </div>
+      );
+    }
 
-  if (!dashboardQuery.data) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground">No dashboard data available</p>
-      </div>
-    );
-  }
+    if (!dashboardQuery.data) {
+      return (
+        <div className="flex items-center justify-center h-64">
+          <p className="text-muted-foreground">No dashboard data available</p>
+        </div>
+      );
+    }
+
+    switch (user.role) {
+      case 'admin':
+        return <AdminDashboard data={dashboardQuery.data as any} />;
+      case 'manager':
+        return <ManagerDashboard data={dashboardQuery.data as any} />;
+      case 'employee':
+        return <EmployeeDashboard data={dashboardQuery.data as any} />;
+      case 'customer':
+        return <CustomerDashboard data={dashboardQuery.data as any} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -88,11 +103,7 @@ export const Dashboard = () => {
         )}
       </div>
 
-      {/* Role-specific dashboard content */}
-      {user.role === 'admin' && <AdminDashboard data={dashboardQuery.data as any} />}
-      {user.role === 'manager' && <ManagerDashboard data={dashboardQuery.data as any} />}
-      {user.role === 'employee' && <EmployeeDashboard data={dashboardQuery.data as any} />}
-      {user.role === 'customer' && <CustomerDashboard data={dashboardQuery.data as any} />}
+      {renderContent()}
     </div>
   );
 };

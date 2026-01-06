@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, Text, LargeBinary
 from sqlalchemy.orm import relationship
 from app.database import Base
-from app.models.base import TimestampMixin
+from app.models.base import TimestampMixin, SoftDeleteMixin
 
-class Category(Base, TimestampMixin):
+class Category(Base, TimestampMixin, SoftDeleteMixin):
     __tablename__ = "categories"
     
     category_id = Column(Integer, primary_key=True, autoincrement=True)

@@ -27,25 +27,28 @@ export function CustomerDashboard({ data }: CustomerDashboardProps) {
         });
     };
 
+    const recentOrders = data.recent_orders ?? [];
+    const favoriteProducts = data.favorite_products ?? [];
+
     return (
         <div className="space-y-6">
             {/* Stats Row */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <StatCard
                     title="Total Orders"
-                    value={data.my_orders_count}
+                    value={data.my_stats?.total_orders ?? 0}
                     icon={ShoppingCart}
                     description="All time"
                 />
                 <StatCard
                     title="Total Spent"
-                    value={formatCurrency(data.my_total_spent)}
+                    value={formatCurrency(data.my_stats?.total_revenue ?? 0)}
                     icon={DollarSign}
                     description="All time"
                 />
                 <StatCard
                     title="Avg Order Value"
-                    value={formatCurrency(data.my_average_order)}
+                    value={formatCurrency(data.my_stats?.average_order_value ?? 0)}
                     icon={TrendingUp}
                 />
             </div>
@@ -68,14 +71,14 @@ export function CustomerDashboard({ data }: CustomerDashboardProps) {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {data.my_recent_orders.length === 0 ? (
+                                {recentOrders.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={4} className="text-center text-muted-foreground">
                                             No orders yet
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    data.my_recent_orders.map((order) => (
+                                    recentOrders.map((order) => (
                                         <TableRow key={order.order_id}>
                                             <TableCell>
                                                 <Link
@@ -88,7 +91,7 @@ export function CustomerDashboard({ data }: CustomerDashboardProps) {
                                             <TableCell>{formatDate(order.order_date)}</TableCell>
                                             <TableCell className="text-right">{formatCurrency(order.total)}</TableCell>
                                             <TableCell>
-                                                <OrderStatusBadge status={order.status} />
+                                                <OrderStatusBadge status={order.status as any} />
                                             </TableCell>
                                         </TableRow>
                                     ))
@@ -115,17 +118,17 @@ export function CustomerDashboard({ data }: CustomerDashboardProps) {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {data.my_favorite_products.length === 0 ? (
+                                {favoriteProducts.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={2} className="text-center text-muted-foreground">
                                             No orders yet
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    data.my_favorite_products.map((product, index) => (
+                                    favoriteProducts.map((product, index) => (
                                         <TableRow key={index}>
                                             <TableCell className="font-medium">{product.product_name}</TableCell>
-                                            <TableCell className="text-right">{product.times_ordered}</TableCell>
+                                            <TableCell className="text-right">{product.total_quantity}</TableCell>
                                         </TableRow>
                                     ))
                                 )}

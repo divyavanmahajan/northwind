@@ -43,7 +43,13 @@ app = FastAPI(
 )
 
 # CORS Middleware
-origins = ["http://localhost:5173", "http://localhost:3000"]
+# When allow_credentials=True, we must specify explicit origins (not "*")
+origins = [
+    "http://localhost:5173",  # Vite dev server
+    "http://localhost:3000",  # Alternative dev server port
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+]
 
 app.add_middleware(
     CORSMiddleware,

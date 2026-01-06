@@ -25,7 +25,7 @@ export function OrderStatusSelect({ currentStatus, onStatusChange, isLoading }: 
 
     return (
         <Select value={currentStatus} onValueChange={onStatusChange} disabled={isLoading}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[140px]" data-testid="status-select">
                 <SelectValue />
             </SelectTrigger>
             <SelectContent>

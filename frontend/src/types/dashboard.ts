@@ -77,17 +77,21 @@ export interface EmployeeDashboardData {
 }
 
 export interface CustomerDashboardData {
-    my_orders_count: number;
-    my_total_spent: string;
-    my_average_order: string;
-    my_recent_orders: Array<{
+    my_stats: SalesMetric;
+    order_status_breakdown: Array<{
+        status: string;
+        count: number;
+    }>;
+    recent_orders: Array<{
         order_id: number;
         order_date: string;
         total: string;
-        status: OrderStatus;
+        status: string;
     }>;
-    my_favorite_products: Array<{
+    favorite_products: Array<{
+        product_id: number;
         product_name: string;
-        times_ordered: number;
+        total_quantity: number;
+        total_revenue: string;
     }>;
 }

@@ -1,8 +1,6 @@
 import axios from 'axios';
 import type { AxiosError, AxiosRequestConfig } from 'axios';
 import type { ApiError } from '@/types/api';
-import { useAuthStore } from '@/store/authStore';
-
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api/v1',
   headers: {
@@ -11,18 +9,29 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  try {
+    const storageItem = localStorage.getItem('auth-storage');
+    if (storageItem) {
+      const { state } = JSON.parse(storageItem);
+      const token = state?.token;
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+  } catch (error) {
+    // Ignore error parsing storage
   }
   return config;
 });
+
 
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      useAuthStore.getState().logout();
+      // Clear storage
+      localStorage.removeItem('auth-storage');
+
       if (!window.location.pathname.includes('/login')) {
         window.location.href = '/login';
       }

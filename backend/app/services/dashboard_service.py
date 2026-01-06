@@ -203,6 +203,7 @@ class DashboardService:
             revenue_trend=self.get_revenue_trend(start, end),
             orders_by_status=self.get_orders_by_status(),
             top_products=self.get_top_products(10),
+            top_customers=self.get_top_customers(10),
             low_stock_alerts=self.get_low_stock_products(10)
         )
     

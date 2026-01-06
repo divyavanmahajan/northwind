@@ -38,6 +38,18 @@ def create_test_users():
             print(f"Created customer user: {user.username}")
         else:
             print("Customer user already exists")
+        # Create Employee
+        if not service.get_by_username("employee"):
+            employee = UserCreate(
+                username="employee",
+                email="employee@example.com",
+                password="Employee123!",
+                role=UserRole.EMPLOYEE
+            )
+            user = service.create(employee)
+            print(f"Created employee user: {user.username}")
+        else:
+            print("Employee user already exists")
 
     finally:
         db.close()

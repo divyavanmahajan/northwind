@@ -41,6 +41,7 @@ function App() {
     }
   }, [token, refreshUser]);
 
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>

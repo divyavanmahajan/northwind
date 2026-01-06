@@ -55,7 +55,7 @@ export function Header() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+            <Button variant="ghost" className="relative h-10 w-10 rounded-full" data-testid="user-menu">
               <Avatar>
                 <AvatarFallback className="bg-gradient-to-br from-blue-500 to-emerald-500 text-white text-xs font-bold">
                   {initials}
@@ -83,7 +83,7 @@ export function Header() {
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive hover:bg-destructive/10">
+            <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive hover:bg-destructive/10" data-testid="logout-button">
               <LogOut className="mr-2 h-4 w-4" />
               Log out
             </DropdownMenuItem>
