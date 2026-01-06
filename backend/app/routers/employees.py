@@ -4,9 +4,9 @@ from typing import Optional, List
 from app.database import get_db
 from app.auth.dependencies import get_current_user, require_roles
 from app.models.user import User, UserRole
-from app.schemas.employee import (
     EmployeeCreate, EmployeeUpdate,
-    EmployeeResponse, EmployeeListResponse
+    EmployeeResponse, EmployeeListResponse,
+    EmployeeStatistics, ManagerInfo, SubordinateInfo
 )
 from app.schemas.common import PaginatedResponse, PaginationInfo, MessageResponse
 from app.services.employee_service import EmployeeService
@@ -14,6 +14,26 @@ from math import ceil
 from app.utils.exceptions import NotFoundError
 
 router = APIRouter(prefix="/employees", tags=["Employees"])
+
+@router.get("/org-tree", response_model=List[dict])
+def get_org_tree(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get organization hierarchy tree."""
+    service = EmployeeService(db)
+    return service.get_org_tree()
+
+@router.get("/managers", response_model=List[EmployeeListResponse])
+def get_managers(
+    exclude: Optional[int] = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get available managers."""
+    service = EmployeeService(db)
+    managers = service.get_available_managers(exclude_id=exclude)
+    return [EmployeeListResponse.model_validate(m) for m in managers]
 
 @router.get("", response_model=PaginatedResponse[EmployeeListResponse])
 def list_employees(
@@ -78,10 +98,32 @@ def get_employee(
         raise NotFoundError(f"Employee with ID {employee_id} not found")
     
     response = EmployeeResponse.model_validate(employee)
+    
+    # Fill Manager info
     if employee.reports_to:
         manager = service.get_by_id(employee.reports_to)
         if manager:
             response.reports_to_name = f"{manager.first_name} {manager.last_name}"
+            response.manager = ManagerInfo(
+                employee_id=manager.employee_id,
+                full_name=f"{manager.first_name} {manager.last_name}",
+                title=manager.title
+            )
+
+    # Fill Subordinates
+    # employee.reports contains subordinates (dynamic query)
+    subordinates = employee.reports.all()
+    response.subordinates = [
+        SubordinateInfo(
+            employee_id=sub.employee_id,
+            full_name=f"{sub.first_name} {sub.last_name}",
+            title=sub.title
+        ) for sub in subordinates
+    ]
+
+    # Fill Statistics
+    response.statistics = service.get_statistics(employee.employee_id)
+    
     return response
 
 @router.post("", response_model=EmployeeResponse, status_code=status.HTTP_201_CREATED)

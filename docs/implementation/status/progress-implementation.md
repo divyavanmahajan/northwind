@@ -20,6 +20,9 @@
 | 16 | Products UI with Search, Filter, Sort, Pagination | Completed |
 | 17 | Customers CRUD (Backend) | Completed |
 | 18 | Customers UI Components | Completed |
-| 19 | Employees CRUD (Backend) | Pending |
+| 19 | Employees CRUD (Backend) | Completed |
+| 20 | Employees UI Components | Completed |
+| 21 | Orders CRUD (Backend) | Pending |
+| 22 | Orders UI Components | Pending |
 | 23 | Data Seeding | Configured (using official Northwind SQL) |
 | ... | ... | ... |

@@ -41,11 +41,40 @@ class EmployeeUpdate(BaseModel):
     reports_to: Optional[int] = None
     photo_path: Optional[str] = Field(None, max_length=255)
 
+from decimal import Decimal
+
+class EmployeeStatistics(BaseModel):
+    total_orders: int = 0
+    orders_this_month: int = 0
+    total_sales: Decimal = Decimal(0)
+    average_order_value: Decimal = Decimal(0)
+
+class ManagerInfo(BaseModel):
+    employee_id: int
+    full_name: str
+    title: Optional[str]
+    model_config = ConfigDict(from_attributes=True)
+
+class SubordinateInfo(BaseModel):
+    employee_id: int
+    full_name: str
+    title: Optional[str]
+    model_config = ConfigDict(from_attributes=True)
+
 class EmployeeResponse(EmployeeBase):
     employee_id: int
     created_at: datetime
     updated_at: datetime
     reports_to_name: Optional[str] = None
+    
+    # Hierarchy and Stats
+    manager: Optional[ManagerInfo] = None
+    subordinates: List[SubordinateInfo] = []
+    statistics: EmployeeStatistics = EmployeeStatistics()
+    
+    @property
+    def full_name(self) -> str:
+        return f"{self.first_name} {self.last_name}"
     
     model_config = ConfigDict(from_attributes=True)
 

@@ -1,0 +1,179 @@
+import { useCallback } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useEmployees, useEmployeeMutations } from '@/hooks/useEmployees';
+import { DataTable } from '@/components/common/DataTable';
+import { Pagination } from '@/components/common/Pagination';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Edit, Trash2, Eye } from 'lucide-react';
+import { toast } from 'sonner';
+import { useAuthStore } from '@/store/authStore';
+import { UserRole } from '@/types/user';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+
+export function EmployeesList() {
+    const navigate = useNavigate();
+    const { user } = useAuthStore();
+    const isAdminOrManager = user?.role === UserRole.ADMIN || user?.role === UserRole.MANAGER;
+
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Parse filters from URL
+    const page = parseInt(searchParams.get('page') || '1');
+    const search = searchParams.get('search') || '';
+    const sortBy = searchParams.get('sort_by') || 'last_name';
+    const sortOrder = (searchParams.get('sort_order') || 'asc') as 'asc' | 'desc';
+    const title = searchParams.get('title') || undefined;
+
+    const { data: employees, isLoading, isError } = useEmployees({
+        page,
+        sort_by: sortBy,
+        sort_order: sortOrder,
+        search,
+        title
+    });
+
+    const { deleteEmployee } = useEmployeeMutations();
+
+    const updateParams = useCallback(
+        (updates: Record<string, any>) => {
+            const newParams = new URLSearchParams(searchParams);
+            Object.entries(updates).forEach(([key, value]) => {
+                if (value !== undefined && value !== '' && value !== null) {
+                    newParams.set(key, String(value));
+                } else {
+                    newParams.delete(key);
+                }
+            });
+            if (!updates.page) {
+                newParams.set('page', '1');
+            }
+            setSearchParams(newParams);
+        },
+        [searchParams, setSearchParams]
+    );
+
+    const handleDelete = async (id: number) => {
+        try {
+            await deleteEmployee.mutateAsync(id);
+            toast.success('Employee deleted successfully');
+        } catch (error: any) {
+            toast.error('Failed to delete employee');
+        }
+    };
+
+    const columns = [
+        { key: 'employee_id', label: 'ID', sortable: true },
+        {
+            key: 'full_name',
+            label: 'Name',
+            sortable: false, // Sort is by last_name/first_name usually
+            render: (emp: any) => `${emp.first_name} ${emp.last_name}`
+        },
+        { key: 'title', label: 'Title', sortable: true },
+        { key: 'city', label: 'City', sortable: true },
+        { key: 'country', label: 'Country', sortable: true },
+        { key: 'reports_to_name', label: 'Reports To', sortable: false },
+        {
+            key: 'actions',
+            label: 'Actions',
+            render: (employee: any) => (
+                <div className="flex justify-end gap-2">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate(`/employees/${employee.employee_id}`)}
+                    >
+                        <Eye className="h-4 w-4" />
+                    </Button>
+                    {isAdminOrManager && (
+                        <>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => navigate(`/employees/${employee.employee_id}/edit`)}
+                            >
+                                <Edit className="h-4 w-4" />
+                            </Button>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-destructive hover:text-destructive"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This will soft-delete the employee.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                            onClick={() => handleDelete(employee.employee_id)}
+                                            className="bg-destructive text-destructive-foreground"
+                                        >
+                                            Delete
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </>
+                    )}
+                </div>
+            ),
+        },
+    ];
+
+    if (isError) return <div>Error loading employees</div>;
+
+    return (
+        <div className="space-y-4">
+            <div className="flex gap-4">
+                <div className="flex-1">
+                    <Input
+                        placeholder="Search employees..."
+                        value={search}
+                        onChange={(e) => updateParams({ search: e.target.value })}
+                        className="max-w-sm"
+                    />
+                </div>
+            </div>
+
+            <DataTable
+                columns={columns}
+                data={employees?.data || []}
+                isLoading={isLoading}
+                onSort={(key, order) => {
+                    // map full_name sort to last_name for backend simplicity or disabling it
+                    if (key === 'full_name') key = 'last_name';
+                    updateParams({ sort_by: key, sort_order: order });
+                }}
+                currentSort={{ key: sortBy, order: sortOrder }}
+            />
+
+            {employees?.pagination && (
+                <Pagination
+                    current={page}
+                    total={employees.pagination.total_pages}
+                    onPageChange={(newPage) => updateParams({ page: newPage })}
+                />
+            )}
+        </div>
+    );
+}

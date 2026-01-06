@@ -20,9 +20,14 @@ import { Products } from '@/pages/Products';
 import { ProductDetail } from '@/pages/ProductDetail';
 import { ProductFormPage } from '@/pages/ProductFormPage';
 
+import { CustomerDetail } from '@/pages/CustomerDetail';
+import { CustomerFormPage } from '@/pages/CustomerFormPage';
+import { Customers } from '@/pages/Customers';
+import { Employees } from '@/pages/Employees';
+import { EmployeeDetail } from '@/pages/EmployeeDetail';
+import { EmployeeFormPage } from '@/pages/EmployeeFormPage';
+
 const Orders = () => <div className="p-8">Orders (Coming Soon)</div>;
-const Customers = () => <div className="p-8">Customers (Coming Soon)</div>;
-const Employees = () => <div className="p-8">Employees (Coming Soon)</div>;
 const Users = () => <div className="p-8">Users (Coming Soon)</div>;
 
 function App() {
@@ -151,6 +156,30 @@ function App() {
                 element={
                   <ProtectedRoute roles={['admin', 'manager', 'employee']}>
                     <Employees />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="employees/new"
+                element={
+                  <ProtectedRoute roles={['admin', 'manager']}>
+                    <EmployeeFormPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="employees/:id"
+                element={
+                  <ProtectedRoute roles={['admin', 'manager', 'employee']}>
+                    <EmployeeDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="employees/:id/edit"
+                element={
+                  <ProtectedRoute roles={['admin', 'manager']}>
+                    <EmployeeFormPage />
                   </ProtectedRoute>
                 }
               />

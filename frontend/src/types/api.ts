@@ -8,6 +8,11 @@ export interface PaginationInfo {
   has_previous: boolean;
 }
 
+export interface PaginationParams {
+  page?: number;
+  page_size?: number;
+}
+
 export interface PaginatedResponse<T> {
   data: T[];
   pagination: PaginationInfo;
