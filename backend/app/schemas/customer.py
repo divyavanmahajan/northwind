@@ -58,3 +58,9 @@ class CustomerListResponse(BaseModel):
     order_count: int = 0
     
     model_config = ConfigDict(from_attributes=True)
+
+class CustomerInfo(BaseModel):
+    customer_id: str
+    company_name: str
+    contact_name: Optional[str] = None
+    model_config = ConfigDict(from_attributes=True)

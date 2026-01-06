@@ -27,6 +27,7 @@ class Employee(Base, TimestampMixin, SoftDeleteMixin):
     # Relationships
     manager = relationship("Employee", remote_side=[employee_id], back_populates="reports")
     reports = relationship("Employee", back_populates="manager", lazy="dynamic")
+    orders = relationship("Order", back_populates="employee", lazy="dynamic")
     
     def __repr__(self):
         return f"<Employee {self.last_name}, {self.first_name}>"

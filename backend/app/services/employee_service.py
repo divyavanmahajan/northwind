@@ -4,12 +4,85 @@ from typing import Optional, List, Tuple
 from app.models.employee import Employee
 from app.schemas.employee import EmployeeCreate, EmployeeUpdate
 from app.utils.exceptions import NotFoundError, ConflictError
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class EmployeeService:
     def __init__(self, db: Session):
         self.db = db
     
+    def get_org_tree(self) -> List[dict]:
+        """Get organization tree starting from top-level employees."""
+        # Top level employees have no manager (reports_to is None)
+        top_level = self.db.query(Employee).filter(
+            Employee.reports_to.is_(None),
+            Employee.deleted_at.is_(None)
+        ).all()
+        
+        def build_tree(employee: Employee) -> dict:
+            # Recursively build tree
+            # Note: using 'reports' relationship which contains subordinates
+            # We must convert the dynamic query to a list for iteration
+            subordinates = employee.reports.filter(Employee.deleted_at.is_(None)).all()
+            
+            return {
+                "employee_id": employee.employee_id,
+                "name": f"{employee.first_name} {employee.last_name}",
+                "title": employee.title,
+                "subordinates": [
+                    build_tree(sub) 
+                    for sub in subordinates
+                ]
+            }
+        
+        return [build_tree(emp) for emp in top_level]
+    
+    def get_available_managers(self, exclude_id: Optional[int] = None) -> List[Employee]:
+        """Get employees who can be managers (for dropdown)."""
+        query = self.db.query(Employee).filter(Employee.deleted_at.is_(None))
+        if exclude_id:
+            # Can't report to self
+            query = query.filter(Employee.employee_id != exclude_id)
+            # ideally also exclude own subordinates to prevent cycles, but doing simpler check for now
+        return query.order_by(Employee.last_name).all()
+    
+    def get_statistics(self, employee_id: int) -> EmployeeStatistics:
+        """Calculate employee order statistics."""
+        from app.models.order import Order
+        from app.models.order_detail import OrderDetail
+        from app.schemas.employee import EmployeeStatistics
+        from decimal import Decimal
+        
+        month_ago = datetime.utcnow() - timedelta(days=30)
+        
+        # Total orders
+        total = self.db.query(func.count(Order.order_id)).filter(
+            Order.employee_id == employee_id,
+            Order.deleted_at.is_(None)
+        ).scalar() or 0
+        
+        # Orders this month
+        this_month = self.db.query(func.count(Order.order_id)).filter(
+            Order.employee_id == employee_id,
+            Order.order_date >= month_ago,
+            Order.deleted_at.is_(None)
+        ).scalar() or 0
+        
+        # Total sales (from order details)
+        # We need to join OrderDetail
+        sales = self.db.query(
+            func.sum(OrderDetail.unit_price * OrderDetail.quantity * (1 - OrderDetail.discount))
+        ).select_from(Order).join(OrderDetail).filter(
+            Order.employee_id == employee_id,
+            Order.deleted_at.is_(None)
+        ).scalar() or Decimal(0)
+        
+        return EmployeeStatistics(
+            total_orders=total,
+            orders_this_month=this_month,
+            total_sales=Decimal(str(sales)),
+            average_order_value=Decimal(str(sales / total)) if total > 0 else Decimal(0)
+        )
+
     def get_by_id(self, employee_id: int) -> Optional[Employee]:
         return self.db.query(Employee).filter(
             Employee.employee_id == employee_id,

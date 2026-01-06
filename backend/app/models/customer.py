@@ -24,8 +24,8 @@ class Customer(Base, TimestampMixin, SoftDeleteMixin):
     
     # Relationships
     user = relationship("User", backref="customer_profile")
-    # Using string reference for Order as it might not be implemented yet
-    # orders = relationship("Order", back_populates="customer", lazy="dynamic") # Order model not yet implemented
+    # Using string reference for Order
+    orders = relationship("Order", back_populates="customer", lazy="dynamic")
     
     def __repr__(self):
         return f"<Customer {self.company_name}>"

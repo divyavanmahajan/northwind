@@ -9,6 +9,7 @@ from app.services.user_service import UserService
 from app.schemas.user import UserCreate
 from app.auth.service import AuthService
 from app.models.user import UserRole
+from datetime import date
 
 # Use a test database or just the dev one for now as per instructions
 # In a real scenario, we'd use a separate test DB or SQLite
@@ -133,3 +134,35 @@ def test_customer(db):
     db.commit()
     db.refresh(customer)
     return customer
+
+@pytest.fixture
+def test_employee(db):
+    from app.models.employee import Employee
+    employee = db.query(Employee).filter(Employee.last_name == "TestEmp").first()
+    if not employee:
+        employee = Employee(
+            last_name="TestEmp",
+            first_name="John",
+            title="Sales Rep",
+            hire_date=date.today()
+        )
+        db.add(employee)
+        db.commit()
+        db.refresh(employee)
+    return employee
+
+@pytest.fixture
+def test_product(db):
+    from app.models.product import Product
+    product = db.query(Product).filter(Product.product_name == "TestProd").first()
+    if not product:
+        product = Product(
+            product_name="TestProd",
+            unit_price=18.00,
+            units_in_stock=100,
+            discontinued=False
+        )
+        db.add(product)
+        db.commit()
+        db.refresh(product)
+    return product

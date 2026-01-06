@@ -1,6 +1,6 @@
 import api from '@/lib/api';
-import { Supplier, SupplierCreate, SupplierUpdate } from '@/types/supplier';
-import { PaginatedResponse } from '@/types/api';
+import type { Supplier, SupplierCreate, SupplierUpdate } from '@/types/supplier';
+import type { PaginatedResponse } from '@/types/api';
 
 const BASE_URL = '/suppliers';
 

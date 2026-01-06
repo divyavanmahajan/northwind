@@ -1,0 +1,81 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.0, pytest-9.0.2, pluggy-1.6.0
+rootdir: /Users/divya/Documents/projects/northwind-test
+plugins: anyio-4.12.0, asyncio-1.3.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 3 items
+
+backend/tests/integration/test_orders_api.py EEE                         [100%]
+
+==================================== ERRORS ====================================
+_____________________ ERROR at setup of test_create_order ______________________
+file /Users/divya/Documents/projects/northwind-test/backend/tests/integration/test_orders_api.py, line 4
+  def test_create_order(client, admin_token, sample_customer, sample_product, sample_employee):
+E       fixture 'sample_customer' not found
+>       available fixtures: _class_scoped_runner, _function_scoped_runner, _module_scoped_runner, _package_scoped_runner, _session_scoped_runner, admin_token, anyio_backend, anyio_backend_name, anyio_backend_options, auth_token, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, client, db, db_session, doctest_namespace, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, test_customer, test_customer_user, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/divya/Documents/projects/northwind-test/backend/tests/integration/test_orders_api.py:4
+---------------------------- Captured stderr setup -----------------------------
+INFO:api:Application starting...
+INFO:api:Database connection established.
+------------------------------ Captured log setup ------------------------------
+INFO     api:main.py:25 Application starting...
+INFO     api:main.py:30 Database connection established.
+_________________ ERROR at setup of test_order_status_workflow _________________
+file /Users/divya/Documents/projects/northwind-test/backend/tests/integration/test_orders_api.py, line 34
+  def test_order_status_workflow(client, admin_token, sample_customer, sample_product):
+E       fixture 'sample_customer' not found
+>       available fixtures: _class_scoped_runner, _function_scoped_runner, _module_scoped_runner, _package_scoped_runner, _session_scoped_runner, admin_token, anyio_backend, anyio_backend_name, anyio_backend_options, auth_token, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, client, db, db_session, doctest_namespace, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, test_customer, test_customer_user, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/divya/Documents/projects/northwind-test/backend/tests/integration/test_orders_api.py:34
+_____________________ ERROR at setup of test_delete_order ______________________
+file /Users/divya/Documents/projects/northwind-test/backend/tests/integration/test_orders_api.py, line 79
+  def test_delete_order(client, admin_token, sample_customer, sample_product):
+E       fixture 'sample_customer' not found
+>       available fixtures: _class_scoped_runner, _function_scoped_runner, _module_scoped_runner, _package_scoped_runner, _session_scoped_runner, admin_token, anyio_backend, anyio_backend_name, anyio_backend_options, auth_token, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, client, db, db_session, doctest_namespace, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, test_customer, test_customer_user, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/Users/divya/Documents/projects/northwind-test/backend/tests/integration/test_orders_api.py:79
+=============================== warnings summary ===============================
+backend/app/routers/categories.py:22
+  /Users/divya/Documents/projects/northwind-test/backend/app/routers/categories.py:22: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    sort_by: str = Query("category_name", regex="^(category_id|category_name|created_at)$"),
+
+backend/app/routers/categories.py:23
+  /Users/divya/Documents/projects/northwind-test/backend/app/routers/categories.py:23: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    sort_order: str = Query("asc", regex="^(asc|desc)$"),
+
+backend/app/routers/suppliers.py:25
+  /Users/divya/Documents/projects/northwind-test/backend/app/routers/suppliers.py:25: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    sort_order: str = Query("asc", regex="^(asc|desc)$"),
+
+backend/app/routers/employees.py:48
+  /Users/divya/Documents/projects/northwind-test/backend/app/routers/employees.py:48: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    sort_order: str = Query("asc", regex="^(asc|desc)$"),
+
+backend/tests/integration/test_orders_api.py::test_create_order
+backend/tests/integration/test_orders_api.py::test_order_status_workflow
+backend/tests/integration/test_orders_api.py::test_delete_order
+  /Users/divya/Documents/projects/northwind-test/backend/app/auth/service.py:32: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    user.last_login = datetime.utcnow()
+
+backend/tests/integration/test_orders_api.py::test_create_order
+backend/tests/integration/test_orders_api.py::test_order_status_workflow
+backend/tests/integration/test_orders_api.py::test_delete_order
+  /Users/divya/Documents/projects/northwind-test/backend/app/auth/jwt.py:25: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    expire = datetime.utcnow() + timedelta(seconds=settings.JWT_EXPIRATION)
+
+backend/tests/integration/test_orders_api.py::test_create_order
+backend/tests/integration/test_orders_api.py::test_order_status_workflow
+backend/tests/integration/test_orders_api.py::test_delete_order
+  /Users/divya/Documents/projects/northwind-test/backend/app/auth/jwt.py:32: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "iat": datetime.utcnow(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR backend/tests/integration/test_orders_api.py::test_create_order
+ERROR backend/tests/integration/test_orders_api.py::test_order_status_workflow
+ERROR backend/tests/integration/test_orders_api.py::test_delete_order
+======================== 13 warnings, 3 errors in 0.90s ========================
