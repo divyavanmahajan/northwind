@@ -26,7 +26,6 @@ import {
 import type { Category } from '@/types/category';
 import { Plus, Pencil, Trash2, LayoutGrid } from 'lucide-react';
 import { useDebouncedCallback } from 'use-debounce';
-import { format } from 'date-fns';
 
 export function Categories() {
     const navigate = useNavigate();
@@ -122,16 +121,6 @@ export function Categories() {
                 <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
                     {cat.product_count} products
                 </div>
-            )
-        },
-        {
-            key: 'created_at',
-            header: 'Created',
-            className: "hidden lg:table-cell",
-            render: (cat: Category) => (
-                <span className="text-xs text-muted-foreground">
-                    {format(new Date(cat.created_at), 'MMM d, yyyy')}
-                </span>
             )
         }
     ], []);
