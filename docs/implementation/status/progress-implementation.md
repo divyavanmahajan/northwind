@@ -11,6 +11,6 @@
 | 07 | JWT Authentication Endpoints | Completed |
 | 08 | Auth Middleware & Protected Routes | Completed |
 | 09 | Frontend Auth Store & Login Page | Completed |
-| 10 | Protected Routes & Role-Based UI | In Progress |
+| 10 | Protected Routes & Role-Based UI | Completed |
 | 23 | Data Seeding | Configured (using official Northwind SQL) |
 | ... | ... | ... |
