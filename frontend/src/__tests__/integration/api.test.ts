@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import api, { apiClient, isApiError } from '@/lib/api';
-import type { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 
 // Mock axios
 vi.mock('axios', async (importOriginal) => {
@@ -21,7 +21,7 @@ vi.mock('axios', async (importOriginal) => {
         isAxiosError: actual.isAxiosError,
         AxiosError: actual.AxiosError,
     };
-    return { default: mockAxios, AxiosError: actual.AxiosError };
+    return { default: mockAxios, ...mockAxios };
 });
 
 describe('API Client', () => {
