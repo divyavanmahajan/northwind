@@ -1,114 +1,97 @@
-import { useHealthReady } from '@/hooks/useHealth';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { RefreshCw, Activity, Database, CheckCircle, XCircle } from 'lucide-react';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { ApiErrorDisplay } from '@/components/common/ApiErrorDisplay';
-import { cn } from '@/lib/utils';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
+import { dashboardService } from '@/services/dashboardService';
+import { AdminDashboard } from '@/components/features/dashboard/AdminDashboard';
+import { ManagerDashboard } from '@/components/features/dashboard/ManagerDashboard';
+import { EmployeeDashboard } from '@/components/features/dashboard/EmployeeDashboard';
+import { CustomerDashboard } from '@/components/features/dashboard/CustomerDashboard';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2 } from 'lucide-react';
 
 export const Dashboard = () => {
-  const { 
-    data: health, 
-    isLoading, 
-    error, 
-    refetch,
-    isRefetching 
-  } = useHealthReady();
+  const { user } = useAuth();
+  const [period, setPeriod] = useState('30d');
 
-  if (error) {
+  // Load appropriate dashboard based on role
+  const dashboardQuery = useQuery({
+    queryKey: ['dashboard', user?.role, period],
+    queryFn: () => {
+      if (!user) return null;
+
+      switch (user.role) {
+        case 'admin':
+          return dashboardService.getAdminDashboard(period);
+        case 'manager':
+          return dashboardService.getManagerDashboard(period);
+        case 'employee':
+          return dashboardService.getEmployeeDashboard();
+        case 'customer':
+          return dashboardService.getCustomerDashboard(period);
+        default:
+          return null;
+      }
+    },
+    enabled: !!user,
+  });
+
+  if (!user) {
     return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <Button onClick={() => refetch()} variant="outline" disabled={isLoading}>
-            Retry Connection
-          </Button>
-        </div>
-        <ApiErrorDisplay error={error} retry={() => refetch()} />
+      <div className="flex items-center justify-center h-64">
+        <p className="text-muted-foreground">Please log in to view your dashboard</p>
       </div>
     );
   }
 
-  const isHealthy = health?.status === 'healthy';
-  const dbStatus = health?.checks?.database?.status;
-  const dbLatency = health?.checks?.database?.latency_ms;
+  if (dashboardQuery.isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (dashboardQuery.isError) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-destructive">Error loading dashboard. Please try again.</p>
+      </div>
+    );
+  }
+
+  if (!dashboardQuery.data) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-muted-foreground">No dashboard data available</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={() => refetch()}
-          disabled={isRefetching || isLoading}
-        >
-          <RefreshCw className={cn("mr-2 h-4 w-4", isRefetching && "animate-spin")} />
-          Refresh
-        </Button>
+    <div className="p-6 space-y-6">
+      {/* Header with period selector */}
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        {user.role !== 'employee' && (
+          <Select value={period} onValueChange={setPeriod}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7d">Last 7 days</SelectItem>
+              <SelectItem value="30d">Last 30 days</SelectItem>
+              <SelectItem value="90d">Last 90 days</SelectItem>
+              <SelectItem value="1y">Last year</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              System Status
-            </CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex items-center gap-2">
-                <LoadingSpinner />
-                <span className="text-xs text-muted-foreground">Checking...</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                {isHealthy ? (
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                ) : (
-                  <XCircle className="h-5 w-5 text-destructive" />
-                )}
-                <div className="text-2xl font-bold capitalize">
-                  {health?.status || 'Unknown'}
-                </div>
-              </div>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">
-              Last updated: {new Date().toLocaleTimeString()}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Database
-            </CardTitle>
-            <Database className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-             {isLoading ? (
-              <LoadingSpinner />
-            ) : (
-              <>
-                <div className="text-2xl font-bold">
-                  {dbLatency ? `${dbLatency}ms` : 'N/A'}
-                </div>
-                <div className="flex items-center gap-2 mt-1">
-                   <div className={cn(
-                     "h-2 w-2 rounded-full",
-                     dbStatus === 'healthy' ? "bg-green-500" : "bg-destructive"
-                   )} />
-                   <p className="text-xs text-muted-foreground capitalize">
-                     {dbStatus || 'Unknown'}
-                   </p>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      {/* Role-specific dashboard content */}
+      {user.role === 'admin' && <AdminDashboard data={dashboardQuery.data} />}
+      {user.role === 'manager' && <ManagerDashboard data={dashboardQuery.data} />}
+      {user.role === 'employee' && <EmployeeDashboard data={dashboardQuery.data} />}
+      {user.role === 'customer' && <CustomerDashboard data={dashboardQuery.data} />}
     </div>
   );
 };
