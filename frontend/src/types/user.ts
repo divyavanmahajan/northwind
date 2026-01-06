@@ -1,0 +1,17 @@
+export enum UserRole {
+    ADMIN = 'admin',
+    MANAGER = 'manager',
+    EMPLOYEE = 'employee',
+    CUSTOMER = 'customer',
+}
+
+export interface User {
+    user_id: string;
+    username: string;
+    email: string;
+    role: UserRole;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    last_login: string | null;
+}

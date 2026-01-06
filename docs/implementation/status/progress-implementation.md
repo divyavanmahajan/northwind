@@ -15,5 +15,6 @@
 | 11 | Categories CRUD (Backend) | Completed |
 | 12 | Categories UI Components | Completed |
 | 13 | Suppliers CRUD (Backend) | Completed |
+| 14 | Suppliers UI Components | Completed |
 | 23 | Data Seeding | Configured (using official Northwind SQL) |
 | ... | ... | ... |

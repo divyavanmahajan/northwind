@@ -13,10 +13,13 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 // Placeholder pages
 import { Categories } from '@/pages/Categories';
+import { Suppliers } from '@/pages/Suppliers';
+import { SupplierDetail } from '@/pages/SupplierDetail';
+import { SupplierFormPage } from '@/pages/SupplierFormPage';
+
 const Products = () => <div className="p-8">Products (Coming Soon)</div>;
 const Orders = () => <div className="p-8">Orders (Coming Soon)</div>;
 const Customers = () => <div className="p-8">Customers (Coming Soon)</div>;
-const Suppliers = () => <div className="p-8">Suppliers (Coming Soon)</div>;
 const Employees = () => <div className="p-8">Employees (Coming Soon)</div>;
 const Users = () => <div className="p-8">Users (Coming Soon)</div>;
 
@@ -65,6 +68,30 @@ function App() {
                 element={
                   <ProtectedRoute roles={['admin', 'manager', 'employee']}>
                     <Suppliers />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="suppliers/:id"
+                element={
+                  <ProtectedRoute roles={['admin', 'manager', 'employee']}>
+                    <SupplierDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="suppliers/new"
+                element={
+                  <ProtectedRoute roles={['admin', 'manager']}>
+                    <SupplierFormPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="suppliers/:id/edit"
+                element={
+                  <ProtectedRoute roles={['admin', 'manager']}>
+                    <SupplierFormPage />
                   </ProtectedRoute>
                 }
               />
