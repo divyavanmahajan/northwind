@@ -83,3 +83,53 @@ def admin_token(db_session):
     
     _, tokens = auth.login(username, password)
     return tokens["access_token"]
+
+@pytest.fixture
+def test_customer_user(db):
+    service = UserService(db)
+    password = "TestCustomer123!"
+    username = "testcustomer"
+    user = service.get_by_username(username)
+    if user:
+        # Cleanup existing user to ensure fresh state with new password
+        from app.models.customer import Customer
+        linked = db.query(Customer).filter(Customer.user_id == user.user_id).first()
+        if linked:
+            linked.user_id = None
+            db.commit()
+        db.delete(user)
+        db.commit()
+        user = None
+
+    if not user:
+        user = service.create(UserCreate(
+            username=username,
+            email="testcustomer@example.com",
+            password=password,
+            role=UserRole.CUSTOMER
+        ))
+    return user
+
+@pytest.fixture
+def test_customer(db):
+    from app.models.customer import Customer
+    customer = db.query(Customer).filter(Customer.customer_id == "ALFKI").first()
+    if not customer:
+        customer = Customer(
+            customer_id="ALFKI",
+            company_name="Alfreds Futterkiste",
+            contact_name="Maria Anders",
+            city="Berlin",
+            country="Germany"
+        )
+        db.add(customer)
+    else:
+        # Ensure it's not deleted
+        customer.deleted_at = None
+        # Reset other fields if needed to known state
+        customer.company_name="Alfreds Futterkiste"
+        customer.contact_name="Maria Anders"
+    
+    db.commit()
+    db.refresh(customer)
+    return customer
