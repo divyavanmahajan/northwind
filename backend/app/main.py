@@ -10,7 +10,7 @@ import logging
 
 from .config import settings
 from .database import engine
-from .routers import health, auth
+from .routers import health, auth, categories
 from .middleware.logging import RequestLoggingMiddleware
 from .utils.exceptions import AppException
 from .schemas.common import ErrorResponse, ErrorDetail
@@ -133,5 +133,6 @@ from fastapi import APIRouter
 api_router = APIRouter(prefix="/api/v1")
 api_router.include_router(health.router)
 api_router.include_router(auth.router)
+api_router.include_router(categories.router)
 
 app.include_router(api_router)
