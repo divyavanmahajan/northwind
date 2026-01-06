@@ -10,7 +10,8 @@ import logging
 
 from .config import settings
 from .database import engine
-from .routers import health, auth, categories, suppliers, products, customers, employees
+from .routers import health, auth, categories, suppliers, products, customers, employees, orders, shippers
+
 from .middleware.logging import RequestLoggingMiddleware
 from .utils.exceptions import AppException
 from .schemas.common import ErrorResponse, ErrorDetail
@@ -138,5 +139,7 @@ api_router.include_router(suppliers.router)
 api_router.include_router(products.router)
 api_router.include_router(customers.router)
 api_router.include_router(employees.router)
+api_router.include_router(orders.router)
+api_router.include_router(shippers.router)
 
 app.include_router(api_router)

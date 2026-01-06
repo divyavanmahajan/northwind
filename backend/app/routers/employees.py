@@ -4,6 +4,7 @@ from typing import Optional, List
 from app.database import get_db
 from app.auth.dependencies import get_current_user, require_roles
 from app.models.user import User, UserRole
+from app.schemas.employee import (
     EmployeeCreate, EmployeeUpdate,
     EmployeeResponse, EmployeeListResponse,
     EmployeeStatistics, ManagerInfo, SubordinateInfo

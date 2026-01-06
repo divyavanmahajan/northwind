@@ -22,7 +22,7 @@
 | 18 | Customers UI Components | Completed |
 | 19 | Employees CRUD (Backend) | Completed |
 | 20 | Employees UI Components | Completed |
-| 21 | Orders CRUD (Backend) | Pending |
+| 21 | Orders CRUD (Backend) | Completed |
 | 22 | Orders UI Components | Pending |
 | 23 | Data Seeding | Configured (using official Northwind SQL) |
 | ... | ... | ... |

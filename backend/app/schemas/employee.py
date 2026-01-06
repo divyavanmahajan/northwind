@@ -61,6 +61,12 @@ class SubordinateInfo(BaseModel):
     title: Optional[str]
     model_config = ConfigDict(from_attributes=True)
 
+class EmployeeInfo(BaseModel):
+    employee_id: int
+    last_name: str
+    first_name: str
+    model_config = ConfigDict(from_attributes=True)
+
 class EmployeeResponse(EmployeeBase):
     employee_id: int
     created_at: datetime

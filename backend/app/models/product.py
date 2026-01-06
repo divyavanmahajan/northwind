@@ -20,7 +20,7 @@ class Product(Base, TimestampMixin, SoftDeleteMixin):
     # Relationships
     category = relationship("Category", back_populates="products")
     supplier = relationship("Supplier", back_populates="products")
-    # order_details = relationship("OrderDetail", back_populates="product", lazy="dynamic")
+    order_details = relationship("OrderDetail", back_populates="product", lazy="dynamic")
     
     @property
     def stock_status(self) -> str:
