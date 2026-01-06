@@ -1,6 +1,6 @@
-import { ApiError } from '@/types/api';
+import type { ApiError } from '@/types/api';
 import { ErrorCard } from './ErrorCard';
-import { AxiosError } from 'axios';
+import type { AxiosError } from 'axios';
 import { isApiError } from '@/lib/api';
 
 interface ApiErrorDisplayProps {

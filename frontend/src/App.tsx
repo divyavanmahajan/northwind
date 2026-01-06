@@ -7,15 +7,26 @@ import { Dashboard } from '@/pages/Dashboard';
 import { Login } from '@/pages/Login';
 import { NotFound } from '@/pages/NotFound';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import { useEffect } from 'react';
+import { useAuthStore } from '@/store/authStore';
 
 function App() {
+  const { token, refreshUser } = useAuthStore();
+
+  useEffect(() => {
+    // Restore auth state on app load
+    if (token) {
+      refreshUser();
+    }
+  }, []);
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
-            
+
             <Route path="/" element={<Layout />}>
               <Route index element={<Navigate to="/dashboard" replace />} />
               <Route path="dashboard" element={<Dashboard />} />

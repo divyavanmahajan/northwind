@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api';
-import { HealthResponse, HealthReadyResponse } from '@/types/api';
+import type { HealthResponse, HealthReadyResponse } from '@/types/api';
 
 export const healthService = {
   getHealth: async (): Promise<HealthResponse> => {

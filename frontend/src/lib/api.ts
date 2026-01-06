@@ -1,5 +1,7 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { ApiError } from '@/types/api';
+import axios from 'axios';
+import type { AxiosError, AxiosRequestConfig } from 'axios';
+import type { ApiError } from '@/types/api';
+import { useAuthStore } from '@/store/authStore';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api/v1',
@@ -9,7 +11,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = useAuthStore.getState().token;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -20,8 +22,10 @@ api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      // window.location.href = '/login'; // Commented out to avoid redirect loop during dev
+      useAuthStore.getState().logout();
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
@@ -32,16 +36,16 @@ export function isApiError(error: unknown): error is AxiosError<ApiError> {
 }
 
 export const apiClient = {
-  get: <T>(url: string, config?: AxiosRequestConfig) => 
+  get: <T>(url: string, config?: AxiosRequestConfig) =>
     api.get<T>(url, config).then((res) => res.data),
-    
-  post: <T>(url: string, data?: any, config?: AxiosRequestConfig) => 
+
+  post: <T>(url: string, data?: any, config?: AxiosRequestConfig) =>
     api.post<T>(url, data, config).then((res) => res.data),
-    
-  put: <T>(url: string, data?: any, config?: AxiosRequestConfig) => 
+
+  put: <T>(url: string, data?: any, config?: AxiosRequestConfig) =>
     api.put<T>(url, data, config).then((res) => res.data),
-    
-  delete: <T>(url: string, config?: AxiosRequestConfig) => 
+
+  delete: <T>(url: string, config?: AxiosRequestConfig) =>
     api.delete<T>(url, config).then((res) => res.data),
 };
 
