@@ -13,7 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { SupplierCreate, Supplier } from '@/types/supplier';
+import type { SupplierCreate, Supplier } from '@/types/supplier';
 
 const supplierSchema = z.object({
     company_name: z.string().min(1, 'Company name is required').max(100),

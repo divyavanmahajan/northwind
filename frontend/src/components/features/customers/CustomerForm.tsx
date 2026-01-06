@@ -12,7 +12,7 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { CustomerFormData } from '@/types/customer';
+import type { Customer, CustomerFormData } from '@/types/customer';
 
 const customerSchema = z.object({
     customer_id: z.string().min(1, 'Customer ID is required').max(5, 'Max 5 characters'),
@@ -30,7 +30,7 @@ const customerSchema = z.object({
 });
 
 interface CustomerFormProps {
-    customer?: CustomerFormData;
+    customer?: Customer;
     onSubmit: (data: CustomerFormData) => void;
     onCancel: () => void;
     isLoading?: boolean;
@@ -39,7 +39,20 @@ interface CustomerFormProps {
 export function CustomerForm({ customer, onSubmit, onCancel, isLoading }: CustomerFormProps) {
     const form = useForm<CustomerFormData>({
         resolver: zodResolver(customerSchema),
-        defaultValues: customer || {
+        defaultValues: customer ? {
+            customer_id: customer.customer_id,
+            company_name: customer.company_name,
+            contact_name: customer.contact_name || '',
+            contact_title: customer.contact_title || '',
+            address: customer.address || '',
+            city: customer.city || '',
+            region: customer.region || '',
+            postal_code: customer.postal_code || '',
+            country: customer.country || '',
+            phone: customer.phone || '',
+            fax: customer.fax || '',
+            user_id: customer.user_id || '',
+        } : {
             customer_id: '',
             company_name: '',
             contact_name: '',

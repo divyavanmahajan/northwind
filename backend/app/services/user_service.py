@@ -128,6 +128,6 @@ class UserService:
         if not user:
             raise NotFoundError("User not found")
         
-        user.is_active = False
+        self.db.delete(user)
         self.db.commit()
         return True

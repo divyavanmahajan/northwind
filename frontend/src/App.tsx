@@ -29,8 +29,7 @@ import { EmployeeFormPage } from '@/pages/EmployeeFormPage';
 import { Orders } from '@/pages/Orders';
 import { OrderDetail } from '@/pages/OrderDetail';
 import { OrderFormPage } from '@/pages/OrderFormPage';
-
-const Users = () => <div className="p-8">Users (Coming Soon)</div>;
+import { Users } from '@/pages/Users';
 
 function App() {
   const { token, refreshUser } = useAuthStore();

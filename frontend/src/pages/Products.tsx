@@ -111,25 +111,25 @@ export function Products() {
     };
 
     const columns = [
-        { key: 'product_id', label: 'ID', sortable: true },
-        { key: 'product_name', label: 'Product', sortable: true },
-        { key: 'category_name', label: 'Category', sortable: true },
-        { key: 'supplier_name', label: 'Supplier', sortable: true },
+        { key: 'product_id', header: 'ID', sortable: true },
+        { key: 'product_name', header: 'Product', sortable: true },
+        { key: 'category_name', header: 'Category', sortable: true },
+        { key: 'supplier_name', header: 'Supplier', sortable: true },
         {
             key: 'unit_price',
-            label: 'Price',
+            header: 'Price',
             sortable: true,
             render: (product: any) => formatCurrency(product.unit_price),
         },
-        { key: 'units_in_stock', label: 'Stock', sortable: true },
+        { key: 'units_in_stock', header: 'Stock', sortable: true },
         {
             key: 'stock_status',
-            label: 'Status',
+            header: 'Status',
             render: (product: any) => <StockStatusBadge status={product.stock_status} />,
         },
         {
             key: 'actions',
-            label: 'Actions',
+            header: 'Actions',
             render: (product: any) => (
                 <div className="flex justify-end gap-2">
                     <Button
@@ -228,14 +228,18 @@ export function Products() {
                     onSort={(key, order) => {
                         updateParams({ sort_by: key, sort_order: order });
                     }}
-                    currentSort={{ key: sortBy, order: sortOrder }}
+                    sortBy={sortBy}
+                    sortOrder={sortOrder}
                 />
 
                 {data?.pagination && (
                     <Pagination
-                        current={page}
-                        total={data.pagination.total_pages}
+                        page={data.pagination.page}
+                        pageSize={data.pagination.page_size}
+                        totalItems={data.pagination.total_items}
+                        totalPages={data.pagination.total_pages}
                         onPageChange={(newPage) => updateParams({ page: newPage })}
+                        onPageSizeChange={(newSize) => updateParams({ page_size: newSize, page: 1 })}
                     />
                 )}
             </div>

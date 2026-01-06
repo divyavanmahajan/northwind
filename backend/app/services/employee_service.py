@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, or_
 from typing import Optional, List, Tuple
 from app.models.employee import Employee
-from app.schemas.employee import EmployeeCreate, EmployeeUpdate
+from app.schemas.employee import EmployeeCreate, EmployeeUpdate, EmployeeStatistics
 from app.utils.exceptions import NotFoundError, ConflictError
 from datetime import datetime, timedelta
 
@@ -49,7 +49,6 @@ class EmployeeService:
         """Calculate employee order statistics."""
         from app.models.order import Order
         from app.models.order_detail import OrderDetail
-        from app.schemas.employee import EmployeeStatistics
         from decimal import Decimal
         
         month_ago = datetime.utcnow() - timedelta(days=30)

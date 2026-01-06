@@ -8,8 +8,8 @@ import {
     Title,
     Tooltip,
     Legend,
-    ChartOptions,
 } from 'chart.js';
+import type { ChartOptions } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 

@@ -13,7 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAvailableManagers } from '@/hooks/useEmployees';
-import { EmployeeFormData, Employee } from '@/types/employee';
+import type { EmployeeFormData, Employee } from '@/types/employee';
 
 const employeeSchema = z.object({
     last_name: z.string().min(1, 'Last name is required').max(20),

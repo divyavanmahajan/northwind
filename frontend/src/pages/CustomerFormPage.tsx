@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCustomer, useCreateCustomer, useUpdateCustomer } from '@/hooks/useCustomers';
 import { CustomerForm } from '@/components/features/customers/CustomerForm';
-import { CustomerFormData } from '@/types/customer';
+import type { CustomerFormData } from '@/types/customer';
 
 export function CustomerFormPage() {
     const { id } = useParams<{ id: string }>();

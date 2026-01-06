@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { CustomerStatistics } from '@/types/customer';
+import type { CustomerStatistics } from '@/types/customer';
 import { DollarSign, ShoppingCart, Calendar, TrendingUp } from 'lucide-react';
 
 interface CustomerStatsProps {

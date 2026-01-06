@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useCategoryOptions, useSupplierOptions } from '@/hooks/useProducts';
-import { ProductFilters } from '@/types/product';
+import type { ProductFilters } from '@/types/product';
 import { Filter, X } from 'lucide-react';
 
 interface ProductFilterPanelProps {

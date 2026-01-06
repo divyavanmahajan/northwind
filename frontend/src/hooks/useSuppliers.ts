@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supplierService, SupplierListParams } from '@/services/supplierService';
-import { SupplierCreate, SupplierUpdate } from '@/types/supplier';
+import { supplierService } from '@/services/supplierService';
+import type { SupplierListParams } from '@/services/supplierService';
+import type { SupplierCreate, SupplierUpdate } from '@/types/supplier';
 
 export const supplierKeys = {
     all: ['suppliers'] as const,

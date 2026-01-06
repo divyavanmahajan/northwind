@@ -1,5 +1,4 @@
-import React from 'react';
-import { OrgNode } from '../../../types/employee';
+import type { OrgNode } from '../../../types/employee';
 import { cn } from '../../../lib/utils';
 import { Avatar, AvatarFallback } from '../../ui/avatar';
 

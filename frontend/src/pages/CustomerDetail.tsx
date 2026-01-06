@@ -21,10 +21,10 @@ export function CustomerDetail() {
     if (!customer) return <div>Customer not found</div>;
 
     const orderColumns = [
-        { key: 'order_id', label: 'Order ID' },
-        { key: 'order_date', label: 'Date' },
-        { key: 'total_amount', label: 'Total' },
-        { key: 'status', label: 'Status' }
+        { key: 'order_id', header: 'Order ID' },
+        { key: 'order_date', header: 'Date' },
+        { key: 'total', header: 'Total' },
+        { key: 'status', header: 'Status' }
     ];
 
     return (

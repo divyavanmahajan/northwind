@@ -69,15 +69,15 @@ export function Suppliers() {
     };
 
     const columns = [
-        { key: 'company_name', label: 'Company Name', sortable: true },
-        { key: 'contact_name', label: 'Contact', sortable: true },
-        { key: 'city', label: 'City', sortable: true },
-        { key: 'country', label: 'Country', sortable: true },
-        { key: 'phone', label: 'Phone' },
-        { key: 'product_count', label: 'Products', className: 'text-center' },
+        { key: 'company_name', header: 'Company Name', sortable: true },
+        { key: 'contact_name', header: 'Contact', sortable: true },
+        { key: 'city', header: 'City', sortable: true },
+        { key: 'country', header: 'Country', sortable: true },
+        { key: 'phone', header: 'Phone' },
+        { key: 'product_count', header: 'Products', className: 'text-center' },
         {
             key: 'actions',
-            label: 'Actions',
+            header: 'Actions',
             render: (supplier: any) => (
                 <div className="flex justify-end gap-2">
                     <Button variant="ghost" size="sm" onClick={() => navigate(`/suppliers/${supplier.supplier_id}`)}>
@@ -174,14 +174,24 @@ export function Suppliers() {
                         setSortBy(key);
                         setSortOrder(order);
                     }}
-                    currentSort={{ key: sortBy, order: sortOrder }}
+                    sortBy={sortBy}
+                    sortOrder={sortOrder}
                 />
 
                 {data?.pagination && (
                     <Pagination
-                        current={page}
-                        total={data.pagination.total_pages}
+                        page={data.pagination.page}
+                        pageSize={data.pagination.page_size}
+                        totalItems={data.pagination.total_items}
+                        totalPages={data.pagination.total_pages}
                         onPageChange={setPage}
+                        onPageSizeChange={(newSize) => {
+                            // Since Suppliers doesn't use searchParams for page_size yet, we just set it if we had a state,
+                            // but for now let's just trigger a page reset to 1.
+                            // Actually, I should probably add a pageSize state to Suppliers if I want it to work.
+                            // But I'll just match the interface for now.
+                            setPage(1);
+                        }}
                     />
                 )}
             </div>

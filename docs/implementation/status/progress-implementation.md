@@ -27,4 +27,6 @@
 | 23 | Data Seeding | Configured (using official Northwind SQL) |
 | 24 | Dashboard API Endpoints | Completed |
 | 25 | Dashboard UI Components with Charts | Completed |
+| 26 | User Management (Admin) | Completed |
+| 27 | E2E Test Setup (Playwright) | Pending |
 | ... | ... | ... |

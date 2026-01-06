@@ -1,3 +1,5 @@
+import type { OrderStatus } from './order';
+
 export interface SalesMetric {
     total_orders: number;
     total_revenue: string;
@@ -28,7 +30,7 @@ export interface LowStockProduct {
 }
 
 export interface OrdersByStatus {
-    status: string;
+    status: OrderStatus;
     count: number;
 }
 
@@ -70,7 +72,7 @@ export interface EmployeeDashboardData {
         customer_name: string;
         order_date: string;
         total: string;
-        status: string;
+        status: OrderStatus;
     }>;
 }
 
@@ -82,7 +84,7 @@ export interface CustomerDashboardData {
         order_id: number;
         order_date: string;
         total: string;
-        status: string;
+        status: OrderStatus;
     }>;
     my_favorite_products: Array<{
         product_name: string;

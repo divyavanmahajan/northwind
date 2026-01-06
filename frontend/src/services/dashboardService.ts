@@ -1,4 +1,4 @@
-import api from './api';
+import api from '@/lib/api';
 import type { AdminDashboardData, ManagerDashboardData, EmployeeDashboardData, CustomerDashboardData } from '@/types/dashboard';
 
 export const dashboardService = {

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { categoryService, type CategoryListParams } from '@/services/categoryService';
-import type { CategoryCreate, CategoryUpdate } from '@/types/category';
+import type { Category, CategoryCreate, CategoryUpdate } from '@/types/category';
+import type { PaginatedResponse } from '@/types/api';
 import { toast } from 'sonner';
 
 export const categoryKeys = {
@@ -11,8 +12,10 @@ export const categoryKeys = {
     detail: (id: number) => [...categoryKeys.details(), id] as const,
 };
 
+
+
 export function useCategories(params: CategoryListParams = {}) {
-    return useQuery({
+    return useQuery<PaginatedResponse<Category>>({
         queryKey: categoryKeys.list(params),
         queryFn: () => categoryService.getList(params),
     });

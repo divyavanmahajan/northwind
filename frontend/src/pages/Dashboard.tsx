@@ -16,8 +16,9 @@ export const Dashboard = () => {
   // Load appropriate dashboard based on role
   const dashboardQuery = useQuery({
     queryKey: ['dashboard', user?.role, period],
-    queryFn: () => {
-      if (!user) return null;
+    queryFn: async () => {
+      if (!user) throw new Error('User not authenticated');
+      if (!user.role) throw new Error('User role not assigned');
 
       switch (user.role) {
         case 'admin':
@@ -29,7 +30,7 @@ export const Dashboard = () => {
         case 'customer':
           return dashboardService.getCustomerDashboard(period);
         default:
-          return null;
+          throw new Error(`Unsupported role: ${user.role}`);
       }
     },
     enabled: !!user,
@@ -88,10 +89,10 @@ export const Dashboard = () => {
       </div>
 
       {/* Role-specific dashboard content */}
-      {user.role === 'admin' && <AdminDashboard data={dashboardQuery.data} />}
-      {user.role === 'manager' && <ManagerDashboard data={dashboardQuery.data} />}
-      {user.role === 'employee' && <EmployeeDashboard data={dashboardQuery.data} />}
-      {user.role === 'customer' && <CustomerDashboard data={dashboardQuery.data} />}
+      {user.role === 'admin' && <AdminDashboard data={dashboardQuery.data as any} />}
+      {user.role === 'manager' && <ManagerDashboard data={dashboardQuery.data as any} />}
+      {user.role === 'employee' && <EmployeeDashboard data={dashboardQuery.data as any} />}
+      {user.role === 'customer' && <CustomerDashboard data={dashboardQuery.data as any} />}
     </div>
   );
 };

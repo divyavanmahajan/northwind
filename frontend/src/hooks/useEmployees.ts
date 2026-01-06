@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import employeeService from '../services/employeeService';
-import { EmployeeFilterParams, EmployeeFormData } from '../types/employee';
+import type { EmployeeFilterParams, EmployeeFormData } from '../types/employee';
 
 export const useEmployees = (params: EmployeeFilterParams) => {
     return useQuery({

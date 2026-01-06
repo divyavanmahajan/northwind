@@ -88,16 +88,16 @@ export function Customers() {
     };
 
     const columns = [
-        { key: 'customer_id', label: 'ID', sortable: true },
-        { key: 'company_name', label: 'Company', sortable: true },
-        { key: 'contact_name', label: 'Contact', sortable: true },
-        { key: 'country', label: 'Country', sortable: true },
-        { key: 'city', label: 'City', sortable: true },
-        { key: 'phone', label: 'Phone', sortable: false },
-        { key: 'order_count', label: 'Orders', sortable: false },
+        { key: 'customer_id', header: 'ID', sortable: true },
+        { key: 'company_name', header: 'Company', sortable: true },
+        { key: 'contact_name', header: 'Contact', sortable: true },
+        { key: 'country', header: 'Country', sortable: true },
+        { key: 'city', header: 'City', sortable: true },
+        { key: 'phone', header: 'Phone', sortable: false },
+        { key: 'order_count', header: 'Orders', sortable: false },
         {
             key: 'actions',
-            label: 'Actions',
+            header: 'Actions',
             render: (customer: any) => (
                 <div className="flex justify-end gap-2">
                     <Button
@@ -190,14 +190,18 @@ export function Customers() {
                     onSort={(key, order) => {
                         updateParams({ sort_by: key, sort_order: order });
                     }}
-                    currentSort={{ key: sortBy, order: sortOrder }}
+                    sortBy={sortBy}
+                    sortOrder={sortOrder}
                 />
 
                 {data?.pagination && (
                     <Pagination
-                        current={page}
-                        total={data.pagination.total_pages}
+                        page={data.pagination.page}
+                        pageSize={data.pagination.page_size}
+                        totalItems={data.pagination.total_items}
+                        totalPages={data.pagination.total_pages}
                         onPageChange={(newPage) => updateParams({ page: newPage })}
+                        onPageSizeChange={(newSize) => updateParams({ page_size: newSize, page: 1 })}
                     />
                 )}
             </div>

@@ -1,8 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { customerService } from '@/services/customerService';
 import type { CustomerFilters, CustomerFormData } from '@/types/customer';
+import type { OrderListResponse } from '@/types/order';
+import type { PaginatedResponse, PaginationParams } from '@/types/api';
 import { toast } from 'sonner';
-import type { PaginationParams } from '@/types/api';
 
 export const customerKeys = {
     all: ['customers'] as const,
@@ -112,9 +113,10 @@ export function useCustomerCities(country?: string) {
     });
 }
 
+
+
 export function useCustomerOrders(id: string, params: PaginationParams = {}) {
-    // Stub implementation until Orders API is ready
-    return useQuery({
+    return useQuery<PaginatedResponse<OrderListResponse>>({
         queryKey: [...customerKeys.detail(id), 'orders', params],
         queryFn: async () => {
             return {
