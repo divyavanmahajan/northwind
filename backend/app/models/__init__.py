@@ -4,5 +4,6 @@ from .category import Category
 from .supplier import Supplier
 from .product import Product
 from .customer import Customer
+from .employee import Employee
 
-__all__ = ["Base", "TimestampMixin", "SoftDeleteMixin", "User", "UserRole", "Category", "Supplier", "Product", "Customer"]
+__all__ = ["Base", "TimestampMixin", "SoftDeleteMixin", "User", "UserRole", "Category", "Supplier", "Product", "Customer", "Employee"]

@@ -10,7 +10,7 @@ import logging
 
 from .config import settings
 from .database import engine
-from .routers import health, auth, categories, suppliers, products, customers
+from .routers import health, auth, categories, suppliers, products, customers, employees
 from .middleware.logging import RequestLoggingMiddleware
 from .utils.exceptions import AppException
 from .schemas.common import ErrorResponse, ErrorDetail
@@ -101,7 +101,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         )
     
     return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST, # Or 422, but prompt said "convert to ErrorResponse format" which usually implies using the schema. The prompt listed ValidationError as 400.
+        status_code=status.HTTP_400_BAD_REQUEST,
         content={
             "error": {
                 "code": "VALIDATION_ERROR",
@@ -137,5 +137,6 @@ api_router.include_router(categories.router)
 api_router.include_router(suppliers.router)
 api_router.include_router(products.router)
 api_router.include_router(customers.router)
+api_router.include_router(employees.router)
 
 app.include_router(api_router)
