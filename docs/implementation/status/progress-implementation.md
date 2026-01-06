@@ -25,4 +25,5 @@
 | 21 | Orders CRUD (Backend) | Completed |
 | 22 | Orders UI Components | Completed |
 | 23 | Data Seeding | Configured (using official Northwind SQL) |
+| 24 | Dashboard API Endpoints | Completed |
 | ... | ... | ... |
