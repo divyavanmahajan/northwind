@@ -10,7 +10,7 @@ import logging
 
 from .config import settings
 from .database import engine
-from .routers import health, auth, categories
+from .routers import health, auth, categories, suppliers
 from .middleware.logging import RequestLoggingMiddleware
 from .utils.exceptions import AppException
 from .schemas.common import ErrorResponse, ErrorDetail
@@ -134,5 +134,6 @@ api_router = APIRouter(prefix="/api/v1")
 api_router.include_router(health.router)
 api_router.include_router(auth.router)
 api_router.include_router(categories.router)
+api_router.include_router(suppliers.router)
 
 app.include_router(api_router)
