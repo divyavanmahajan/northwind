@@ -26,8 +26,10 @@ import { Customers } from '@/pages/Customers';
 import { Employees } from '@/pages/Employees';
 import { EmployeeDetail } from '@/pages/EmployeeDetail';
 import { EmployeeFormPage } from '@/pages/EmployeeFormPage';
+import { Orders } from '@/pages/Orders';
+import { OrderDetail } from '@/pages/OrderDetail';
+import { OrderFormPage } from '@/pages/OrderFormPage';
 
-const Orders = () => <div className="p-8">Orders (Coming Soon)</div>;
 const Users = () => <div className="p-8">Users (Coming Soon)</div>;
 
 function App() {
@@ -180,6 +182,39 @@ function App() {
                 element={
                   <ProtectedRoute roles={['admin', 'manager']}>
                     <EmployeeFormPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="orders"
+                element={
+                  <ProtectedRoute roles={['admin', 'manager', 'employee', 'customer']}>
+                    <Orders />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="orders/new"
+                element={
+                  <ProtectedRoute roles={['admin', 'manager']}>
+                    <OrderFormPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="orders/:id"
+                element={
+                  <ProtectedRoute roles={['admin', 'manager', 'employee', 'customer']}>
+                    <OrderDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="orders/:id/edit"
+                element={
+                  <ProtectedRoute roles={['admin', 'manager']}>
+                    <OrderFormPage />
                   </ProtectedRoute>
                 }
               />

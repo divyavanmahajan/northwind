@@ -72,7 +72,7 @@ export interface OrgNode {
     subordinates: OrgNode[];
 }
 
-import { PaginationParams } from './api';
+import type { PaginationParams } from './api';
 
 export interface EmployeeFilterParams extends PaginationParams {
     search?: string;

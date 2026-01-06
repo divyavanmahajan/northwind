@@ -1,6 +1,6 @@
-import api from './api';
-import { Employee, EmployeeFormData, EmployeeFilterParams, OrgNode } from '../types/employee';
-import { PaginatedResponse } from '../types/api';
+import api from '@/lib/api';
+import type { Employee, EmployeeFormData, EmployeeFilterParams, OrgNode } from '../types/employee';
+import type { PaginatedResponse } from '../types/api';
 
 const employeeService = {
     getAll: (params?: EmployeeFilterParams) =>
