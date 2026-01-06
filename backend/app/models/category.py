@@ -12,7 +12,7 @@ class Category(Base, TimestampMixin):
     picture = Column(LargeBinary, nullable=True)  # Store as binary, rarely used
     
     # Relationships
-    # products = relationship("Product", back_populates="category", lazy="dynamic")
+    products = relationship("Product", back_populates="category", lazy="dynamic")
     
     def __repr__(self):
         return f"<Category {self.category_name}>"
