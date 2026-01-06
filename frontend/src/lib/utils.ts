@@ -12,3 +12,8 @@ export function formatCurrency(value: number | null | undefined): string {
     currency: 'USD',
   }).format(value);
 }
+
+export function formatDate(dateString: string | null | undefined): string {
+  if (!dateString) return '-';
+  return new Date(dateString).toLocaleDateString();
+}

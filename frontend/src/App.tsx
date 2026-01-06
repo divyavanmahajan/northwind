@@ -83,8 +83,32 @@ function App() {
               <Route
                 path="customers"
                 element={
-                  <ProtectedRoute roles={['admin', 'manager', 'employee']}>
+                  <ProtectedRoute roles={['admin', 'manager', 'employee', 'customer']}>
                     <Customers />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="customers/new"
+                element={
+                  <ProtectedRoute roles={['admin', 'manager']}>
+                    <CustomerFormPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="customers/:id"
+                element={
+                  <ProtectedRoute roles={['admin', 'manager', 'employee', 'customer']}>
+                    <CustomerDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="customers/:id/edit"
+                element={
+                  <ProtectedRoute roles={['admin', 'manager']}>
+                    <CustomerFormPage />
                   </ProtectedRoute>
                 }
               />
