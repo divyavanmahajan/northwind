@@ -12,8 +12,8 @@ import { useAuthStore } from '@/store/authStore';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 // Placeholder pages
+import { Categories } from '@/pages/Categories';
 const Products = () => <div className="p-8">Products (Coming Soon)</div>;
-const Categories = () => <div className="p-8">Categories (Coming Soon)</div>;
 const Orders = () => <div className="p-8">Orders (Coming Soon)</div>;
 const Customers = () => <div className="p-8">Customers (Coming Soon)</div>;
 const Suppliers = () => <div className="p-8">Suppliers (Coming Soon)</div>;
