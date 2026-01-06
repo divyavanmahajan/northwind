@@ -20,7 +20,7 @@ class Supplier(Base, TimestampMixin, SoftDeleteMixin):
     homepage = Column(Text, nullable=True)
     
     # Relationships
-    # products = relationship("Product", back_populates="supplier", lazy="dynamic")
+    products = relationship("Product", back_populates="supplier", lazy="dynamic")
     
     def __repr__(self):
         return f"<Supplier {self.company_name}>"
