@@ -114,19 +114,19 @@ class OrderService:
         return order
     
     def update(self, order_id: int, data: OrderUpdate) -> Order:
-         order = self.get_by_id(order_id)
-         if not order:
-             raise NotFoundError(f"Order {order_id} not found")
-         
-         update_data = data.model_dump(exclude_unset=True)
-         # Handle nested order_details if present
-         details_data = update_data.pop("order_details", None)
+        order = self.get_by_id(order_id)
+        if not order:
+            raise NotFoundError(f"Order {order_id} not found")
+        
+        update_data = data.model_dump(exclude_unset=True)
+        # Handle nested order_details if present
+        details_data = update_data.pop("order_details", None)
         
         # Validate customer if changing
         if "customer_id" in update_data:
             customer = self.db.query(Customer).filter(Customer.customer_id == update_data["customer_id"]).first()
             if not customer:
-                 raise NotFoundError(f"Customer {update_data['customer_id']} not found")
+                raise NotFoundError(f"Customer {update_data['customer_id']} not found")
 
         for key, value in update_data.items():
             setattr(order, key, value)
@@ -137,7 +137,7 @@ class OrderService:
             for detail in details_data:
                 product = self.db.query(Product).filter(Product.product_id == detail["product_id"]).first()
                 if not product:
-                     raise NotFoundError(f"Product {detail['product_id']} not found")
+                    raise NotFoundError(f"Product {detail['product_id']} not found")
                 
                 order_detail = OrderDetail(
                     order_id=order_id,
