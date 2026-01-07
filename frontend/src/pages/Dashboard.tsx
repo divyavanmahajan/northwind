@@ -101,6 +101,7 @@ export const Dashboard = () => {
               <SelectItem value="30d">Last 30 days</SelectItem>
               <SelectItem value="90d">Last 90 days</SelectItem>
               <SelectItem value="1y">Last year</SelectItem>
+              <SelectItem value="all">All Time</SelectItem>
             </SelectContent>
           </Select>
         )}
