@@ -17,6 +17,10 @@ class OrderDetail(Base):
     product = relationship("Product", back_populates="order_details")
     
     @property
+    def product_name(self) -> str:
+        return self.product.product_name if self.product else "Unknown Product"
+    
+    @property
     def line_total(self) -> Decimal:
         return Decimal(str(self.unit_price)) * self.quantity
     
