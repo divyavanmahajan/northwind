@@ -11,6 +11,50 @@ Currently, two official plugins are available:
 
 The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
+## API Proxy Configuration
+
+The frontend development server is configured with a Vite proxy to forward API requests to the backend, eliminating CORS issues during development.
+
+### How It Works
+
+All requests to `/api/*` are automatically proxied to `http://localhost:8000/api/*`:
+
+```typescript
+// vite.config.ts
+server: {
+  proxy: {
+    '/api': {
+      target: 'http://localhost:8000',
+      changeOrigin: true,
+      secure: false,
+      ws: true, // WebSocket support
+    }
+  }
+}
+```
+
+### Benefits
+
+- **No CORS errors** in development
+- **Simplified configuration** - no need for backend CORS setup
+- **Production-ready** - works seamlessly with nginx reverse proxy
+- **WebSocket support** for real-time features
+
+### Usage
+
+The API client automatically uses the proxy:
+
+```typescript
+// Automatically proxied to http://localhost:8000/api/v1/products
+const products = await apiClient.get('/products');
+```
+
+### Environment Variables
+
+By default, no `VITE_API_URL` is needed in development. The proxy handles routing automatically.
+
+For production builds, set `VITE_API_URL` to your backend API endpoint.
+
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:

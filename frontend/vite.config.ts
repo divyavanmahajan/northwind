@@ -12,11 +12,18 @@ export default defineConfig({
   },
   server: {
     host: true, // For Docker
+    port: 5173,
+    // API Proxy Configuration
+    // Proxies all /api/* requests to the backend server
+    // This eliminates CORS issues during development
     proxy: {
-        '/api': {
-            target: 'http://localhost:8000',
-            changeOrigin: true,
-        }
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
+        // WebSocket support for potential real-time features
+        ws: true,
+      }
     }
   }
 })
