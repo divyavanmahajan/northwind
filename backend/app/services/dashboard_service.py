@@ -22,7 +22,16 @@ class DashboardService:
         self.user = current_user
     
     def _get_date_range(self, period: str) -> Tuple[date, date]:
-        end = date.today()
+        # Handle historical seed data by finding the latest order date
+        latest_order = self.db.query(func.max(Order.order_date)).filter(Order.deleted_at.is_(None)).scalar()
+        
+        # If no orders or if latest order is within the last year, use today
+        if not latest_order or latest_order > date.today() - timedelta(days=365):
+            end = date.today()
+        else:
+            # For demonstration with historical data, use the latest order date as 'today'
+            end = latest_order
+            
         days_map = {"7d": 7, "30d": 30, "90d": 90, "1y": 365}
         start = end - timedelta(days=days_map.get(period, 30))
         return start, end
@@ -63,14 +72,30 @@ class DashboardService:
         
         total_orders = current[0] or 0
         total_revenue = Decimal(str(current[1] or 0))
+
+        # Previous revenue for comparison
+        prev_revenue_query = self.db.query(
+            func.coalesce(func.sum(OrderDetail.unit_price * OrderDetail.quantity * (1 - OrderDetail.discount)), 0)
+        ).select_from(Order).join(OrderDetail).filter(
+            Order.order_date >= prev_start,
+            Order.order_date <= prev_end,
+            Order.deleted_at.is_(None)
+        )
         
-        change = ((total_orders - previous) / previous * 100) if previous > 0 else 0
+        if customer_id:
+            prev_revenue_query = prev_revenue_query.filter(Order.customer_id == customer_id)
+            
+        previous_revenue = Decimal(str(prev_revenue_query.scalar() or 0))
+        
+        orders_change = ((total_orders - previous) / previous * 100) if previous > 0 else 0
+        revenue_change = ((total_revenue - previous_revenue) / previous_revenue * 100) if previous_revenue > 0 else 0
         
         return SalesMetric(
             total_orders=total_orders,
             total_revenue=total_revenue,
             average_order_value=total_revenue / total_orders if total_orders > 0 else Decimal(0),
-            orders_change_percent=round(change, 1)
+            orders_change_percent=round(orders_change, 1),
+            revenue_change_percent=round(revenue_change, 1)
         )
     
     def get_revenue_trend(self, start: date, end: date) -> List[RevenueByPeriod]:
@@ -90,7 +115,7 @@ class DashboardService:
             Order.deleted_at.is_(None)
         ).group_by(period_func).order_by(period_func).all()
         
-        return [RevenueByPeriod(period=r.period, revenue=Decimal(str(r.revenue)), orders=r.orders) for r in results]
+        return [RevenueByPeriod(period=r.period, revenue=Decimal(str(r.revenue)), order_count=r.orders) for r in results]
     
     def get_orders_by_status(self, customer_id: str = None) -> List[OrdersByStatus]:
         query = self.db.query(
@@ -125,8 +150,8 @@ class DashboardService:
         return [TopProduct(
             product_id=r.product_id,
             product_name=r.product_name,
-            total_quantity=r.total_qty,
-            total_revenue=Decimal(str(r.revenue))
+            quantity_sold=r.total_qty,
+            revenue=Decimal(str(r.revenue))
         ) for r in results]
     
     def get_top_customers(self, limit: int = 10) -> List[TopCustomer]:
@@ -145,7 +170,7 @@ class DashboardService:
             customer_id=r.customer_id,
             company_name=r.company_name,
             total_orders=r.total_orders,
-            total_spent=Decimal(str(r.total_spent))
+            total_revenue=Decimal(str(r.total_spent))
         ) for r in results]
     
     def get_low_stock_products(self, limit: int = 10) -> List[LowStockProduct]:
@@ -177,8 +202,9 @@ class DashboardService:
         
         return UserStats(
             total_users=total,
-            users_by_role={r[0].value: r[1] for r in by_role},
             active_users=active,
+            new_users_this_period=0, # Simplified for now
+            users_by_role={r[0].value: r[1] for r in by_role},
             inactive_users=total - active
         )
     

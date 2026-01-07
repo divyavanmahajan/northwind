@@ -12,19 +12,20 @@ class SalesMetric(BaseModel):
     total_orders: int
     total_revenue: Decimal
     average_order_value: Decimal
-    orders_change_percent: float  # vs previous period
+    orders_change_percent: float
+    revenue_change_percent: float
 
 class TopProduct(BaseModel):
     product_id: int
     product_name: str
-    total_quantity: int
-    total_revenue: Decimal
+    quantity_sold: int
+    revenue: Decimal
 
 class TopCustomer(BaseModel):
     customer_id: str
     company_name: str
     total_orders: int
-    total_spent: Decimal
+    total_revenue: Decimal
 
 class LowStockProduct(BaseModel):
     product_id: int
@@ -40,12 +41,13 @@ class OrdersByStatus(BaseModel):
 class RevenueByPeriod(BaseModel):
     period: str  # e.g., "2026-01" for month
     revenue: Decimal
-    orders: int
+    order_count: int
 
 class UserStats(BaseModel):
     total_users: int
-    users_by_role: dict
     active_users: int
+    new_users_this_period: int
+    users_by_role: dict
     inactive_users: int
 
 # Role-specific responses
