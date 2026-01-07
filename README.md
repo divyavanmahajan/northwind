@@ -163,16 +163,16 @@ For convenience, use the development management script:
 
 ```bash
 # Start all services (backend + frontend)
-./scripts/local_dev.sh start
+./scripts/local-dev.sh start
 
 # Stop all services
-./scripts/local_dev.sh stop
+./scripts/local-dev.sh stop
 
 # Check service status
-./scripts/local_dev.sh status
+./scripts/local-dev.sh status
 
 # Restart all services
-./scripts/local_dev.sh restart
+./scripts/local-dev.sh restart
 ```
 
 See [scripts/README.md](scripts/README.md) for more options including individual service control.

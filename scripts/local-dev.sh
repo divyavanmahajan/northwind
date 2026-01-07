@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Northwind Local Development Server Management Script
-# Usage: ./scripts/local_dev.sh [start|stop|restart|status]
+# Usage: ./scripts/local-dev.sh [start|stop|restart|status]
 
 set -e
 

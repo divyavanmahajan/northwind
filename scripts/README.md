@@ -2,7 +2,7 @@
 
 This directory contains utility scripts for managing the Northwind development environment.
 
-## local_dev.sh
+## local-dev.sh
 
 Comprehensive script to manage local development servers (backend Docker services and frontend Vite server).
 
@@ -10,31 +10,31 @@ Comprehensive script to manage local development servers (backend Docker service
 
 ```bash
 # Show help
-./scripts/local_dev.sh
+./scripts/local-dev.sh
 
 # Start all services
-./scripts/local_dev.sh start
+./scripts/local-dev.sh start
 
 # Stop all services
-./scripts/local_dev.sh stop
+./scripts/local-dev.sh stop
 
 # Restart all services
-./scripts/local_dev.sh restart
+./scripts/local-dev.sh restart
 
 # Check status
-./scripts/local_dev.sh status
+./scripts/local-dev.sh status
 ```
 
 ### Individual Service Commands
 
 ```bash
 # Backend only
-./scripts/local_dev.sh backend-start
-./scripts/local_dev.sh backend-stop
+./scripts/local-dev.sh backend-start
+./scripts/local-dev.sh backend-stop
 
 # Frontend only
-./scripts/local_dev.sh frontend-start
-./scripts/local_dev.sh frontend-stop
+./scripts/local-dev.sh frontend-start
+./scripts/local-dev.sh frontend-stop
 ```
 
 ### Features
