@@ -2,6 +2,45 @@
 
 A modern, full-stack web application based on the classic Northwind database, built with FastAPI, React (Vite), TypeScript, and PostgreSQL.
 
+## 📸 Overview
+
+The Northwind Web Application is a comprehensive business management system that demonstrates modern web development practices. Built with a focus on user experience and developer productivity, it provides a complete solution for managing products, orders, customers, employees, and suppliers.
+
+### Key Highlights
+
+**🎨 Modern UI/UX**
+- Clean, responsive design with Tailwind CSS
+- Role-based dashboards with real-time analytics
+- Intuitive navigation and data management
+
+**🔐 Secure Authentication**
+- JWT-based authentication with role-based access control
+- Three user roles: Admin, Manager, and Employee
+- Secure session management
+
+**📊 Rich Data Visualization**
+- Interactive charts and analytics
+- Advanced filtering and search capabilities
+- Comprehensive CRUD operations
+
+### Application Screenshots
+
+#### Login Page
+![Login Page](docs/images/login-page.png)
+*Secure authentication with email and password*
+
+#### Dashboard
+![Dashboard](docs/images/dashboard-page.png)
+*Role-specific analytics with sales trends, top products, and key metrics*
+
+#### Products Management
+![Products Page](docs/images/products-page.png)
+*Comprehensive product catalog with search, filter, and inventory management*
+
+#### Orders Management
+![Orders Page](docs/images/orders-page.png)
+*Order tracking and management with status workflow and detailed order information*
+
 ## 📋 Table of Contents
 
 - [Features](#features)
@@ -113,9 +152,9 @@ A modern, full-stack web application based on the classic Northwind database, bu
 
 5. **Default credentials**
    ```
-   Admin: admin@northwind.com / admin123
-   Manager: manager@northwind.com / manager123
-   Employee: employee@northwind.com / employee123
+   Admin: admin@northwind.com / Admin123!
+   Manager: manager@northwind.com / Manager123!
+   Employee: employee@northwind.com / Employee123!
    ```
 
 ### Development Scripts
