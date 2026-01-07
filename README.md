@@ -2,23 +2,23 @@
 
 A modern, full-stack web application based on the classic Northwind database, built with FastAPI, React (Vite), TypeScript, and PostgreSQL.
 
-## 📸 Overview
+## Overview
 
 The Northwind Web Application is a comprehensive business management system that demonstrates modern web development practices. Built with a focus on user experience and developer productivity, it provides a complete solution for managing products, orders, customers, employees, and suppliers.
 
 ### Key Highlights
 
-**🎨 Modern UI/UX**
+**Modern UI/UX**
 - Clean, responsive design with Tailwind CSS
 - Role-based dashboards with real-time analytics
 - Intuitive navigation and data management
 
-**🔐 Secure Authentication**
+**Secure Authentication**
 - JWT-based authentication with role-based access control
 - Three user roles: Admin, Manager, and Employee
 - Secure session management
 
-**📊 Rich Data Visualization**
+**Rich Data Visualization**
 - Interactive charts and analytics
 - Advanced filtering and search capabilities
 - Comprehensive CRUD operations
@@ -41,7 +41,7 @@ The Northwind Web Application is a comprehensive business management system that
 ![Orders Page](docs/images/orders-page.png)
 *Order tracking and management with status workflow and detailed order information*
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Features](#features)
 - [Architecture](#architecture)
@@ -53,7 +53,7 @@ The Northwind Web Application is a comprehensive business management system that
 - [API Documentation](#api-documentation)
 - [Contributing](#contributing)
 
-## ✨ Features
+## Features
 
 ### Authentication & Authorization
 - JWT-based authentication
@@ -79,7 +79,7 @@ The Northwind Web Application is a comprehensive business management system that
 - Component documentation with Storybook
 - 80%+ backend test coverage
 
-## 🏗 Architecture
+## Architecture
 
 ```
 ┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
@@ -116,14 +116,14 @@ The Northwind Web Application is a comprehensive business management system that
 - Nginx (production)
 - Gunicorn (production)
 
-## 📦 Prerequisites
+## Prerequisites
 
 - **Docker** and **Docker Compose** (recommended)
 - **Node.js 20+** (for local frontend development)
 - **Python 3.11+** (for local backend development)
 - **Git**
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Using Docker (Recommended)
 
@@ -177,7 +177,7 @@ For convenience, use the development management script:
 
 See [scripts/README.md](scripts/README.md) for more options including individual service control.
 
-## 💻 Development
+## Development
 
 ### Project Structure
 
@@ -270,7 +270,7 @@ npm run type-check
 npm run format
 ```
 
-## 🚢 Production Deployment
+## Production Deployment
 
 See [docs/deployment.md](docs/deployment.md) for detailed deployment instructions.
 
@@ -294,7 +294,7 @@ See [docs/deployment.md](docs/deployment.md) for detailed deployment instruction
    docker-compose -f docker-compose.prod.yml logs
    ```
 
-## 🧪 Testing
+## Testing
 
 ### Backend Tests
 ```bash
@@ -322,7 +322,7 @@ npm run test:e2e
 npm run test:e2e:ui
 ```
 
-## 📚 API Documentation
+## API Documentation
 
 Interactive API documentation is available at:
 - **Swagger UI**: http://localhost:8000/docs
@@ -330,7 +330,7 @@ Interactive API documentation is available at:
 
 See [docs/api.md](docs/api.md) for detailed API documentation.
 
-## 🤝 Contributing
+## Contributing
 
 Please read [docs/developer-guidelines.md](docs/developer-guidelines.md) for:
 - Git workflow and branch naming
@@ -339,11 +339,11 @@ Please read [docs/developer-guidelines.md](docs/developer-guidelines.md) for:
 - Testing requirements
 - Pull request process
 
-## 📄 License
+## License
 
 This project is for educational purposes.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Northwind database originally from Microsoft
 - Sample data from [harryho/db-samples](https://github.com/harryho/db-samples)
