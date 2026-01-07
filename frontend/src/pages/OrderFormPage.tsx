@@ -48,10 +48,34 @@ export function OrderFormPage() {
         { product_id: 0, quantity: 1, discount: 0 },
     ]);
 
-    const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<OrderFormData>({
+    const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<OrderFormData>({
         resolver: zodResolver(orderSchema),
-        values: order as any,
     });
+
+    // Populate form when data is loaded
+    useEffect(() => {
+        if (order) {
+            reset({
+                customer_id: order.customer.customer_id,
+                employee_id: order.employee?.employee_id,
+                ship_name: order.ship_name || '',
+                ship_address: order.ship_address || '',
+                ship_city: order.ship_city || '',
+                ship_region: order.ship_region || '',
+                ship_postal_code: order.ship_postal_code || '',
+                ship_country: order.ship_country || '',
+                freight: order.freight,
+            });
+
+            if (order.order_details && order.order_details.length > 0) {
+                setOrderDetails(order.order_details.map(d => ({
+                    product_id: d.product_id,
+                    quantity: d.quantity,
+                    discount: Number(d.discount)
+                })));
+            }
+        }
+    }, [order, reset]);
 
     const onSubmit = async (data: OrderFormData) => {
         const payload = {
@@ -109,7 +133,7 @@ export function OrderFormPage() {
                     <CardContent className="space-y-4">
                         <div>
                             <Label htmlFor="customer_id">Customer *</Label>
-                            <Select onValueChange={(v) => setValue('customer_id', v)} defaultValue={watch('customer_id')}>
+                            <Select onValueChange={(v) => setValue('customer_id', v)} value={watch('customer_id')}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select customer" />
                                 </SelectTrigger>
@@ -126,11 +150,12 @@ export function OrderFormPage() {
 
                         <div>
                             <Label htmlFor="employee_id">Employee</Label>
-                            <Select onValueChange={(v) => setValue('employee_id', parseInt(v))} defaultValue={watch('employee_id')?.toString()}>
+                            <Select onValueChange={(v) => setValue('employee_id', parseInt(v))} value={watch('employee_id')?.toString() || 'NONE'}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select employee" />
                                 </SelectTrigger>
                                 <SelectContent>
+                                    <SelectItem value="NONE">Unassigned</SelectItem>
                                     {employeesData?.data.map((e) => (
                                         <SelectItem key={e.employee_id} value={e.employee_id.toString()}>
                                             {e.first_name} {e.last_name}

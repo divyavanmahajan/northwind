@@ -29,6 +29,8 @@ class OrderCreate(BaseModel):
     order_details: List[OrderDetailCreate] = Field(..., min_length=1)
 
 class OrderUpdate(BaseModel):
+    customer_id: Optional[str] = None
+    employee_id: Optional[int] = None
     order_date: Optional[date] = None
     required_date: Optional[date] = None
     shipped_date: Optional[date] = None
@@ -39,7 +41,8 @@ class OrderUpdate(BaseModel):
     ship_city: Optional[str] = None
     ship_region: Optional[str] = None
     ship_postal_code: Optional[str] = None
-    ship_country: Optional[str] = None    
+    ship_country: Optional[str] = None
+    order_details: Optional[List[OrderDetailCreate]] = None
 
 class OrderDetailResponse(BaseModel):
     product_id: int

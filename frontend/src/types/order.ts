@@ -96,6 +96,8 @@ export interface CreateOrderData {
 }
 
 export interface UpdateOrderData {
+    customer_id?: string;
+    employee_id?: number | null;
     order_date?: string | null;
     required_date?: string | null;
     shipped_date?: string | null;
@@ -107,6 +109,7 @@ export interface UpdateOrderData {
     ship_region?: string;
     ship_postal_code?: string;
     ship_country?: string;
+    order_details?: StartOrderDetail[];
 }
 
 export interface OrderFilterParams extends PaginationParams {

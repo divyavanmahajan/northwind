@@ -53,7 +53,12 @@ class OrderService:
         return orders, total
 
     def get_by_id(self, order_id: int) -> Optional[Order]:
-        query = self.db.query(Order).filter(
+        from sqlalchemy.orm import joinedload
+        query = self.db.query(Order).options(
+            joinedload(Order.customer),
+            joinedload(Order.employee),
+            joinedload(Order.order_details).joinedload(OrderDetail.product)
+        ).filter(
             Order.order_id == order_id,
             Order.deleted_at.is_(None)
         )
@@ -114,12 +119,38 @@ class OrderService:
              raise NotFoundError(f"Order {order_id} not found")
          
          update_data = data.model_dump(exclude_unset=True)
-         for key, value in update_data.items():
+         # Handle nested order_details if present
+         details_data = update_data.pop("order_details", None)
+        
+        # Validate customer if changing
+        if "customer_id" in update_data:
+            customer = self.db.query(Customer).filter(Customer.customer_id == update_data["customer_id"]).first()
+            if not customer:
+                 raise NotFoundError(f"Customer {update_data['customer_id']} not found")
+
+        for key, value in update_data.items():
             setattr(order, key, value)
             
-         self.db.commit()
-         self.db.refresh(order)
-         return order
+        if details_data is not None:
+            # Simple approach: replace all details
+            self.db.query(OrderDetail).filter(OrderDetail.order_id == order_id).delete()
+            for detail in details_data:
+                product = self.db.query(Product).filter(Product.product_id == detail["product_id"]).first()
+                if not product:
+                     raise NotFoundError(f"Product {detail['product_id']} not found")
+                
+                order_detail = OrderDetail(
+                    order_id=order_id,
+                    product_id=detail["product_id"],
+                    unit_price=detail.get("unit_price") or product.unit_price,
+                    quantity=detail["quantity"],
+                    discount=detail["discount"]
+                )
+                self.db.add(order_detail)
+
+        self.db.commit()
+        self.db.refresh(order)
+        return order
 
     def update_status(self, order_id: int, new_status: OrderStatus) -> Order:
         """Update order status with validation."""
