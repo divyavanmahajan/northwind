@@ -13,6 +13,7 @@ export default defineConfig({
   server: {
     host: true, // For Docker
     port: 5173,
+    allowedHosts: ['.tuns.sh'],
     // API Proxy Configuration
     // Proxies all /api/* requests to the backend server
     // This eliminates CORS issues during development
