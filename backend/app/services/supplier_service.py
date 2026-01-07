@@ -130,3 +130,12 @@ class SupplierService:
         except Exception:
             # Handle case where Product model is not yet available
             return 0
+
+    def get_products(self, supplier_id: int) -> List[any]:
+        supplier = self.get_by_id(supplier_id)
+        if not supplier:
+            return []
+        try:
+            return supplier.products.filter_by(deleted_at=None).all()
+        except Exception:
+            return []

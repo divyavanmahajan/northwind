@@ -49,4 +49,9 @@ export const supplierService = {
         const response = await api.get<string[]>(`${BASE_URL}/filters/cities`, { params });
         return response.data;
     },
+
+    async getProducts(id: number): Promise<any[]> {
+        const response = await api.get<any[]>(`${BASE_URL}/${id}/products`);
+        return response.data;
+    }
 };

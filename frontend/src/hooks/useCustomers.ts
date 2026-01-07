@@ -118,19 +118,7 @@ export function useCustomerCities(country?: string) {
 export function useCustomerOrders(id: string, params: PaginationParams = {}) {
     return useQuery<PaginatedResponse<OrderListResponse>>({
         queryKey: [...customerKeys.detail(id), 'orders', params],
-        queryFn: async () => {
-            return {
-                data: [],
-                pagination: {
-                    page: 1,
-                    page_size: params.page_size || 10,
-                    total_items: 0,
-                    total_pages: 0,
-                    has_next: false,
-                    has_previous: false
-                }
-            };
-        },
+        queryFn: () => customerService.getOrders(id, params),
         enabled: !!id,
     });
 }

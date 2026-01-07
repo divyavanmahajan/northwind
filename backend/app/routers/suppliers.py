@@ -8,6 +8,8 @@ from app.schemas.supplier import (
     SupplierCreate, SupplierUpdate,
     SupplierResponse, SupplierListResponse
 )
+from app.schemas.product import ProductResponse
+from app.utils.exceptions import NotFoundError
 from app.schemas.common import PaginatedResponse, PaginationInfo, MessageResponse
 from app.services.supplier_service import SupplierService
 from math import ceil
@@ -80,7 +82,6 @@ def get_supplier(
     service = SupplierService(db)
     supplier = service.get_by_id(supplier_id)
     if not supplier:
-        from app.utils.exceptions import NotFoundError
         raise NotFoundError(f"Supplier with ID {supplier_id} not found")
     
     response = SupplierResponse.model_validate(supplier)
@@ -124,3 +125,14 @@ def delete_supplier(
     service = SupplierService(db)
     service.delete(supplier_id)
     return MessageResponse(message=f"Supplier {supplier_id} deleted successfully")
+
+@router.get("/{supplier_id}/products", response_model=List[ProductResponse])
+def get_supplier_products(
+    supplier_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get all products from a supplier."""
+    service = SupplierService(db)
+    products = service.get_products(supplier_id)
+    return products

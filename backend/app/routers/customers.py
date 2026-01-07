@@ -12,6 +12,7 @@ from app.schemas.customer import (
     CustomerResponse,
     CustomerListResponse
 )
+from app.schemas.order import OrderListResponse
 from app.services.customer_service import CustomerService
 from app.utils.exceptions import NotFoundError
 
@@ -131,13 +132,6 @@ def create_customer(
     current_user: User = Depends(get_current_active_user)
 ):
     """Create new customer (Admin/Manager only)."""
-    if current_user.role not in [UserRole.ADMIN, UserRole.MANAGER]:
-        raise NotFoundError("Not authorized") # Using NotFound to hide endpoint existence? Or more standard 403.
-        # Usually standard is 403 Forbidden. I will check other routers.
-        # But here I'll stick to simple check or maybe use a specialized dependency if available.
-        # Actually I should raise HTTPException(403).
-    
-    # Better to use CheckRole dependency if available or just check manually and raise 403
     from fastapi import HTTPException
     if current_user.role not in [UserRole.ADMIN, UserRole.MANAGER]:
         raise HTTPException(status_code=403, detail="Not authorized to create customers")
@@ -183,3 +177,43 @@ def delete_customer(
 
     service = CustomerService(db, current_user)
     service.delete(customer_id)
+
+@router.get("/{customer_id}/orders", response_model=PaginatedResponse[OrderListResponse])
+def get_customer_orders(
+    customer_id: str,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
+    status: Optional[str] = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """Get customer's order history."""
+    service = CustomerService(db, current_user)
+    
+    # Check access (Customer role can only see their own orders)
+    if current_user.role == UserRole.CUSTOMER:
+        customer = service.get_for_current_user()
+        if not customer or customer.customer_id != customer_id:
+            raise HTTPException(status_code=403, detail="Not authorized to view these orders")
+            
+    items, total = service.get_orders(
+        customer_id=customer_id,
+        page=page,
+        page_size=page_size,
+        status=status
+    )
+    
+    total_pages = (total + page_size - 1) // page_size
+    pagination = PaginationInfo(
+        page=page,
+        page_size=page_size,
+        total_items=total,
+        total_pages=total_pages,
+        has_next=page < total_pages,
+        has_previous=page > 1
+    )
+    
+    return PaginatedResponse(
+        data=items,
+        pagination=pagination
+    )

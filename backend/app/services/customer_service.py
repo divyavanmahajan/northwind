@@ -168,17 +168,38 @@ class CustomerService:
 
     def get_statistics(self, customer_id: str) -> CustomerStatistics:
         """Calculate customer order statistics."""
-        # TODO: Uncomment and implement when Order model is available
-        # from app.models.order import Order
-        # from app.models.order_detail import OrderDetail
+        from app.models.order import Order
         
-        # For now return zero stats
+        # Get orders for this customer
+        query = self.db.query(Order).filter(
+            Order.customer_id == customer_id,
+            Order.deleted_at.is_(None)
+        )
+        
+        orders = query.all()
+        total_orders = len(orders)
+        
+        if total_orders == 0:
+            return CustomerStatistics(
+                total_orders=0,
+                total_spent=Decimal(0),
+                average_order_value=Decimal(0),
+                first_order_date=None,
+                last_order_date=None
+            )
+            
+        total_spent = sum((o.total for o in orders), Decimal(0))
+        avg_value = total_spent / total_orders
+        
+        first_order = min((o.order_date for o in orders if o.order_date), default=None)
+        last_order = max((o.order_date for o in orders if o.order_date), default=None)
+
         return CustomerStatistics(
-            total_orders=0,
-            total_spent=Decimal(0),
-            average_order_value=Decimal(0),
-            first_order_date=None,
-            last_order_date=None
+            total_orders=total_orders,
+            total_spent=total_spent,
+            average_order_value=avg_value,
+            first_order_date=first_order,
+            last_order_date=last_order
         )
     
     def get_for_current_user(self) -> Optional[Customer]:
@@ -192,5 +213,33 @@ class CustomerService:
 
     def get_order_count(self, customer_id: str) -> int:
         """Get number of orders for a customer."""
-        # Placeholder until Order model is implemented
-        return 0
+        from app.models.order import Order
+        return self.db.query(Order).filter(
+            Order.customer_id == customer_id,
+            Order.deleted_at.is_(None)
+        ).count()
+
+    def get_orders(
+        self,
+        customer_id: str,
+        page: int = 1,
+        page_size: int = 10,
+        status: Optional[str] = None
+    ) -> Tuple[List[any], int]:
+        """Get orders for a customer with pagination."""
+        from app.models.order import Order
+        
+        query = self.db.query(Order).filter(
+            Order.customer_id == customer_id,
+            Order.deleted_at.is_(None)
+        )
+        
+        if status:
+            query = query.filter(Order.status == status)
+            
+        total = query.count()
+        
+        offset = (page - 1) * page_size
+        orders = query.order_by(Order.order_date.desc()).offset(offset).limit(page_size).all()
+        
+        return orders, total

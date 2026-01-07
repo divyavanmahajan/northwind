@@ -78,3 +78,11 @@ export function useDeleteSupplier() {
         },
     });
 }
+
+export function useSupplierProducts(id: number) {
+    return useQuery({
+        queryKey: [...supplierKeys.detail(id), 'products'],
+        queryFn: () => supplierService.getProducts(id),
+        enabled: !!id,
+    });
+}

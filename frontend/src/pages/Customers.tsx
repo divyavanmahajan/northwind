@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import { UserRole } from '@/types/user';
 import { EmptyState } from '@/components/common/EmptyState';
-import { AlertCircle, Plus, Edit, Trash2, Eye } from 'lucide-react';
+import { AlertCircle, Plus, Pencil, Trash2, Eye } from 'lucide-react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -106,8 +106,12 @@ export function Customers() {
                 <div className="flex justify-end gap-2">
                     <Button
                         variant="ghost"
-                        size="sm"
-                        onClick={() => navigate(`/ customers / ${customer.customer_id} `)}
+                        size="icon"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/customers/${customer.customer_id}`);
+                        }}
+                        className="h-8 w-8"
                     >
                         <Eye className="h-4 w-4" />
                     </Button>
@@ -115,17 +119,21 @@ export function Customers() {
                         <>
                             <Button
                                 variant="ghost"
-                                size="sm"
-                                onClick={() => navigate(`/ customers / ${customer.customer_id}/edit`)}
+                                size="icon"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/customers/${customer.customer_id}/edit`);
+                                }}
+                                className="h-8 w-8 hover:text-primary"
                             >
-                                <Edit className="h-4 w-4" />
-                            </Button >
+                                <Pencil className="h-4 w-4" />
+                            </Button>
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                     <Button
                                         variant="ghost"
-                                        size="sm"
-                                        className="text-destructive hover:text-destructive"
+                                        size="icon"
+                                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                                     >
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
@@ -150,74 +158,74 @@ export function Customers() {
                             </AlertDialog>
                         </>
                     )}
-                </div >
-            ),
+                    ),
         },
-    ];
+                    ];
 
-    if (isError) {
+                    if (isError) {
         return (
-            <EmptyState
-                title="Error loading customers"
-                description="We encountered an issue while fetching the customer list."
-                icon={AlertCircle}
-                action={{ label: "Retry", onClick: () => window.location.reload() }}
-            />
-        );
+                    <EmptyState
+                        title="Error loading customers"
+                        description="We encountered an issue while fetching the customer list."
+                        icon={AlertCircle}
+                        action={{ label: "Retry", onClick: () => window.location.reload() }}
+                    />
+                    );
     }
 
-    return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
-                    <p className="text-muted-foreground">
-                        Manage your customer database.
-                    </p>
-                </div>
-                {isAdminOrManager && (
-                    <Button asChild>
-                        <Link to="/customers/new">
-                            <Plus className="mr-2 h-4 w-4" /> Add Customer
-                        </Link>
-                    </Button>
-                )}
-            </div>
+                    return (
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
+                                <p className="text-muted-foreground">
+                                    Manage your customer database.
+                                </p>
+                            </div>
+                            {isAdminOrManager && (
+                                <Button asChild>
+                                    <Link to="/customers/new">
+                                        <Plus className="mr-2 h-4 w-4" /> Add Customer
+                                    </Link>
+                                </Button>
+                            )}
+                        </div>
 
-            <div className="space-y-4">
-                <div className="flex gap-4">
-                    <div className="flex-1">
-                        <Input
-                            placeholder="Search customers..."
-                            value={search}
-                            onChange={(e) => updateParams({ search: e.target.value })}
-                            className="max-w-sm"
-                        />
+                        <div className="space-y-4">
+                            <div className="flex gap-4">
+                                <div className="flex-1">
+                                    <Input
+                                        placeholder="Search customers..."
+                                        value={search}
+                                        onChange={(e) => updateParams({ search: e.target.value })}
+                                        className="max-w-sm"
+                                    />
+                                </div>
+                            </div>
+
+                            <DataTable
+                                columns={columns}
+                                data={data?.data || []}
+                                isLoading={isLoading}
+                                onSort={(key, order) => {
+                                    updateParams({ sort_by: key, sort_order: order });
+                                }}
+                                sortBy={sortBy}
+                                sortOrder={sortOrder}
+                                onRowClick={(customer) => navigate(`/customers/${customer.customer_id}`)}
+                            />
+
+                            {data?.pagination && (
+                                <Pagination
+                                    page={data.pagination.page}
+                                    pageSize={data.pagination.page_size}
+                                    totalItems={data.pagination.total_items}
+                                    totalPages={data.pagination.total_pages}
+                                    onPageChange={(newPage) => updateParams({ page: newPage })}
+                                    onPageSizeChange={(newSize) => updateParams({ page_size: newSize, page: 1 })}
+                                />
+                            )}
+                        </div>
                     </div>
-                </div>
-
-                <DataTable
-                    columns={columns}
-                    data={data?.data || []}
-                    isLoading={isLoading}
-                    onSort={(key, order) => {
-                        updateParams({ sort_by: key, sort_order: order });
-                    }}
-                    sortBy={sortBy}
-                    sortOrder={sortOrder}
-                />
-
-                {data?.pagination && (
-                    <Pagination
-                        page={data.pagination.page}
-                        pageSize={data.pagination.page_size}
-                        totalItems={data.pagination.total_items}
-                        totalPages={data.pagination.total_pages}
-                        onPageChange={(newPage) => updateParams({ page: newPage })}
-                        onPageSizeChange={(newSize) => updateParams({ page_size: newSize, page: 1 })}
-                    />
-                )}
-            </div>
-        </div>
-    );
+                    );
 }

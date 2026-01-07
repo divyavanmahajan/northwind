@@ -43,5 +43,10 @@ export const customerService = {
         const params = country ? { country } : {};
         const response = await api.get<string[]>(`${BASE_URL}/cities`, { params });
         return response.data;
+    },
+
+    async getOrders(id: string, params: PaginationParams = {}): Promise<PaginatedResponse<any>> {
+        const response = await api.get<PaginatedResponse<any>>(`${BASE_URL}/${id}/orders`, { params });
+        return response.data;
     }
 };

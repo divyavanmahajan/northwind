@@ -1,9 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useSupplier, useDeleteSupplier } from '@/hooks/useSuppliers';
+import { useSupplier, useDeleteSupplier, useSupplierProducts } from '@/hooks/useSuppliers';
 import { Button } from '@/components/ui/button';
+import { DataTable } from '@/components/common/DataTable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Edit, Trash2, ArrowLeft, Globe, Phone, MapPin } from 'lucide-react';
+import { Edit, Trash2, ArrowLeft, Globe, Phone, MapPin, Package, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { formatCurrency } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
 import { UserRole } from '@/types/user';
 import {
@@ -26,6 +28,7 @@ export function SupplierDetail() {
 
     const supplierId = parseInt(id || '0');
     const { data: supplier, isLoading, isError } = useSupplier(supplierId);
+    const { data: products, isLoading: isLoadingProducts } = useSupplierProducts(supplierId);
     const deleteMutation = useDeleteSupplier();
 
     const handleDelete = async () => {
@@ -38,8 +41,48 @@ export function SupplierDetail() {
         }
     };
 
-    if (isLoading) return <div>Loading...</div>;
-    if (isError || !supplier) return <div>Supplier not found</div>;
+    if (isLoading) return <div className="p-8 text-center">Loading supplier details...</div>;
+    if (isError || !supplier) {
+        return (
+            <div className="p-8 text-center space-y-4">
+                <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
+                <h3 className="text-lg font-medium">Supplier not found</h3>
+                <Button onClick={() => navigate('/suppliers')}>Back to Suppliers</Button>
+            </div>
+        );
+    }
+
+    const productColumns = [
+        {
+            key: 'product_id',
+            header: 'ID',
+            className: 'w-[80px]'
+        },
+        {
+            key: 'product_name',
+            header: 'Product Name',
+            render: (product: any) => (
+                <span className="font-medium text-primary cursor-pointer hover:underline" onClick={() => navigate(`/products/${product.product_id}`)}>
+                    {product.product_name}
+                </span>
+            )
+        },
+        {
+            key: 'category_name',
+            header: 'Category',
+            render: (product: any) => product.category?.category_name || 'N/A'
+        },
+        {
+            key: 'unit_price',
+            header: 'Unit Price',
+            render: (product: any) => formatCurrency(product.unit_price)
+        },
+        {
+            key: 'units_in_stock',
+            header: 'Stock',
+            className: 'w-[100px]'
+        }
+    ];
 
     return (
         <div className="space-y-6">
@@ -137,11 +180,20 @@ export function SupplierDetail() {
 
                 {/* Products List Placeholder */}
                 <Card className="md:col-span-3">
-                    <CardHeader>
-                        <CardTitle>Products from this Supplier</CardTitle>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <CardTitle className="flex items-center gap-2">
+                            <Package className="h-5 w-5 text-primary" />
+                            Products from this Supplier
+                        </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-muted-foreground italic">Product management will be implemented in Step 16.</p>
+                        <DataTable
+                            columns={productColumns}
+                            data={products || []}
+                            isLoading={isLoadingProducts}
+                            onRowClick={(product) => navigate(`/products/${product.product_id}`)}
+                            emptyMessage="This supplier has no products listed."
+                        />
                     </CardContent>
                 </Card>
             </div>
