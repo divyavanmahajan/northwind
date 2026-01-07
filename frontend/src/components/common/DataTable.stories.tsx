@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn } from '@storybook/test'
 import { DataTable } from './DataTable'
 import type { ColumnDef } from '@tanstack/react-table'
 
@@ -81,8 +80,8 @@ export const WithActions: Story = {
     args: {
         columns,
         data: sampleProducts,
-        onEdit: fn(),
-        onDelete: fn(),
+        onEdit: () => console.log('Edit clicked'),
+        onDelete: () => console.log('Delete clicked'),
     },
 }
 

@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn } from '@storybook/test'
 import { Pagination } from './Pagination'
 
 const meta = {
@@ -10,8 +9,8 @@ const meta = {
     },
     tags: ['autodocs'],
     args: {
-        onPageChange: fn(),
-        onPageSizeChange: fn(),
+        onPageChange: () => console.log('Page changed'),
+        onPageSizeChange: () => console.log('Page size changed'),
     },
 } satisfies Meta<typeof Pagination>
 

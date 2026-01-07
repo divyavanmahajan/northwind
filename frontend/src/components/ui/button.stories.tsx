@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn } from '@storybook/test'
 import { Button } from './button'
 import { Mail, Loader2 } from 'lucide-react'
 
@@ -21,7 +20,7 @@ const meta = {
         },
     },
     args: {
-        onClick: fn(),
+        onClick: () => console.log('Button clicked'),
     },
 } satisfies Meta<typeof Button>
 

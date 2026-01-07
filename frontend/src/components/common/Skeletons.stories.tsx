@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { TableSkeleton, CardSkeleton, PageSkeleton } from './Skeletons'
+import { TableSkeleton, CardSkeleton, PageLoading } from './Skeletons'
 
 const meta = {
     title: 'Common/Skeletons',
@@ -30,6 +30,6 @@ export const Card: StoryObj = {
     ),
 }
 
-export const Page: StoryObj = {
-    render: () => <PageSkeleton />,
+export const PageLoadingState: StoryObj = {
+    render: () => <PageLoading />,
 }
