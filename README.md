@@ -1,45 +1,153 @@
 # Northwind Web Application
 
-A modern web application based on the classic Northwind database, built with FastAPI, React (Vite), and PostgreSQL.
+A modern, full-stack web application based on the classic Northwind database, built with FastAPI, React (Vite), TypeScript, and PostgreSQL.
 
-## Prerequisites
+## 📋 Table of Contents
 
-- Docker and Docker Compose
-- Node.js (for local frontend development without Docker)
-- Python 3.11+ (for local backend development without Docker)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Development](#development)
+- [Production Deployment](#production-deployment)
+- [Testing](#testing)
+- [API Documentation](#api-documentation)
+- [Contributing](#contributing)
 
-## Project Structure
+## ✨ Features
 
-- `backend/`: FastAPI application
-- `frontend/`: React application (Vite)
-- `docs/`: Project documentation and implementation steps
+### Authentication & Authorization
+- JWT-based authentication
+- Role-based access control (Admin, Manager, Employee)
+- Secure password hashing with bcrypt
 
-## Quick Start
+### Business Modules
+- **Categories**: Manage product categories
+- **Suppliers**: Supplier information and management
+- **Products**: Product catalog with search, filter, and pagination
+- **Customers**: Customer relationship management
+- **Employees**: Employee directory and management
+- **Orders**: Order processing and tracking with status workflow
+- **Dashboard**: Role-specific analytics and charts
 
-1. Clone the repository
-2. Copy `.env.example` to `.env` and adjust if needed:
+### Technical Features
+- RESTful API with FastAPI
+- React SPA with TypeScript
+- Responsive UI with Tailwind CSS
+- Real-time form validation
+- Comprehensive error handling
+- E2E testing with Playwright
+- Component documentation with Storybook
+- 80%+ backend test coverage
+
+## 🏗 Architecture
+
+```
+┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
+│                 │      │                 │      │                 │
+│  React Frontend │─────▶│  FastAPI Backend│─────▶│   PostgreSQL    │
+│   (Vite + TS)   │      │   (Python 3.11) │      │   Database      │
+│                 │      │                 │      │                 │
+└─────────────────┘      └─────────────────┘      └─────────────────┘
+```
+
+### Tech Stack
+
+**Frontend:**
+- React 18 with TypeScript
+- Vite for build tooling
+- Tailwind CSS for styling
+- Zustand for state management
+- React Hook Form for forms
+- Recharts for data visualization
+- Playwright for E2E testing
+- Storybook for component documentation
+
+**Backend:**
+- FastAPI (Python 3.11)
+- SQLAlchemy ORM
+- Alembic for migrations
+- Pydantic for validation
+- JWT authentication
+- Pytest for testing
+
+**Infrastructure:**
+- Docker & Docker Compose
+- PostgreSQL 15
+- Nginx (production)
+- Gunicorn (production)
+
+## 📦 Prerequisites
+
+- **Docker** and **Docker Compose** (recommended)
+- **Node.js 20+** (for local frontend development)
+- **Python 3.11+** (for local backend development)
+- **Git**
+
+## 🚀 Quick Start
+
+### Using Docker (Recommended)
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd northwind-test
+   ```
+
+2. **Configure environment**
    ```bash
    cp .env.example .env
+   # Edit .env if needed
    ```
-3. Start the application using Docker Compose:
+
+3. **Start the application**
    ```bash
    docker-compose up -d
    ```
 
-## Services and Ports
+4. **Access the application**
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:8000
+   - API Docs: http://localhost:8000/docs
+   - Database: localhost:5432
 
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
-- **Database**: localhost:5432
+5. **Default credentials**
+   ```
+   Admin: admin@northwind.com / admin123
+   Manager: manager@northwind.com / manager123
+   Employee: employee@northwind.com / employee123
+   ```
 
-## Development
+## 💻 Development
+
+### Project Structure
+
+```
+northwind-test/
+├── backend/
+│   ├── app/
+│   │   ├── api/          # API endpoints
+│   │   ├── core/         # Core config & security
+│   │   ├── models/       # SQLAlchemy models
+│   │   ├── schemas/      # Pydantic schemas
+│   │   └── services/     # Business logic
+│   ├── tests/            # Backend tests
+│   └── requirements.txt
+├── frontend/
+│   ├── src/
+│   │   ├── components/   # React components
+│   │   ├── hooks/        # Custom hooks
+│   │   ├── lib/          # Utilities
+│   │   ├── pages/        # Page components
+│   │   └── stores/       # Zustand stores
+│   └── package.json
+├── docs/                 # Documentation
+└── docker-compose.yml
+```
 
 ### Database
 
-The database is automatically seeded with Northwind sample data on first startup. The seed data comes from:
-- **Source**: https://github.com/harryho/db-samples/blob/2050c61088775c101c48b9747a2e4eb96a201ad2/pgsql/northwind.sql
-- **Local file**: `backend/data/northwind-docker.sql`
+The database is automatically seeded with Northwind sample data on first startup.
 
 **Included data:**
 - 8 Categories
@@ -51,17 +159,133 @@ The database is automatically seeded with Northwind sample data on first startup
 - 830 Orders
 - 2,155 Order Details
 
-**To reset the database with fresh data:**
+**Reset database:**
 ```bash
 docker-compose down
 docker volume rm northwind-test_postgres_data
 docker-compose up -d
 ```
 
-### Backend
+### Backend Development
 
-The backend is mounted as a volume, so changes to `backend/app` will trigger a reload.
+**Run tests:**
+```bash
+docker-compose exec backend pytest
+docker-compose exec backend pytest --cov=app --cov-report=html
+```
 
-### Frontend
+**Create migration:**
+```bash
+docker-compose exec backend alembic revision --autogenerate -m "description"
+docker-compose exec backend alembic upgrade head
+```
 
-The frontend is mounted as a volume. Run `npm install` inside the container or locally to manage dependencies.
+**Code quality:**
+```bash
+cd backend
+black app/
+flake8 app/
+mypy app/
+```
+
+### Frontend Development
+
+**Run tests:**
+```bash
+cd frontend
+npm run test
+npm run test:e2e
+```
+
+**Storybook:**
+```bash
+cd frontend
+npm run storybook
+```
+
+**Code quality:**
+```bash
+cd frontend
+npm run lint
+npm run type-check
+npm run format
+```
+
+## 🚢 Production Deployment
+
+See [docs/deployment.md](docs/deployment.md) for detailed deployment instructions.
+
+**Quick production build:**
+
+1. **Configure production environment**
+   ```bash
+   cp .env.production.example .env.production
+   # Edit .env.production with production values
+   ```
+
+2. **Build and start**
+   ```bash
+   docker-compose -f docker-compose.prod.yml build
+   docker-compose -f docker-compose.prod.yml up -d
+   ```
+
+3. **Verify deployment**
+   ```bash
+   docker-compose -f docker-compose.prod.yml ps
+   docker-compose -f docker-compose.prod.yml logs
+   ```
+
+## 🧪 Testing
+
+### Backend Tests
+```bash
+# Run all tests
+docker-compose exec backend pytest
+
+# With coverage
+docker-compose exec backend pytest --cov=app --cov-report=html
+
+# Specific test file
+docker-compose exec backend pytest tests/test_auth.py
+```
+
+### Frontend Tests
+```bash
+cd frontend
+
+# Unit tests
+npm run test
+
+# E2E tests
+npm run test:e2e
+
+# E2E UI mode
+npm run test:e2e:ui
+```
+
+## 📚 API Documentation
+
+Interactive API documentation is available at:
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+
+See [docs/api.md](docs/api.md) for detailed API documentation.
+
+## 🤝 Contributing
+
+Please read [docs/developer-guidelines.md](docs/developer-guidelines.md) for:
+- Git workflow and branch naming
+- Commit message conventions
+- Code style guidelines
+- Testing requirements
+- Pull request process
+
+## 📄 License
+
+This project is for educational purposes.
+
+## 🙏 Acknowledgments
+
+- Northwind database originally from Microsoft
+- Sample data from [harryho/db-samples](https://github.com/harryho/db-samples)
+
