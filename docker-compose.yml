@@ -45,7 +45,7 @@ services:
     environment:
       VITE_API_URL: http://localhost:8000/api/v1
     ports:
-      - "5174:5174"
+      - "15173:5173"
     volumes:
       - ./frontend:/app
       - /app/node_modules
