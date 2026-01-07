@@ -33,7 +33,8 @@ class OrderService:
         page: int = 1, 
         page_size: int = 25,
         status: Optional[OrderStatus] = None,
-        customer_id: Optional[str] = None
+        customer_id: Optional[str] = None,
+        product_id: Optional[int] = None
     ) -> Tuple[List[Order], int]:
         query = self.db.query(Order).filter(Order.deleted_at.is_(None))
         query = self._apply_access_filter(query)
@@ -42,6 +43,8 @@ class OrderService:
             query = query.filter(Order.status == status)
         if customer_id:
              query = query.filter(Order.customer_id == customer_id)
+        if product_id:
+            query = query.join(OrderDetail).filter(OrderDetail.product_id == product_id)
         
         total = query.count()
         

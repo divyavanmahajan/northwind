@@ -1,13 +1,16 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useProduct, useDeleteProduct } from '@/hooks/useProducts';
+import { useOrders } from '@/hooks/useOrders';
 import { Button } from '@/components/ui/button';
+import { DataTable } from '@/components/common/DataTable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import { UserRole } from '@/types/user';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, formatDate } from '@/lib/utils';
 import { StockStatusBadge } from '@/components/features/products/StockStatusBadge';
+import { OrderStatusBadge } from '@/components/features/orders/OrderStatusBadge';
 import { PageLoading } from '@/components/common/Skeletons';
 import { EmptyState } from '@/components/common/EmptyState';
 import { AlertCircle, ArrowLeft, Edit, Trash2, Package, DollarSign, TrendingUp } from 'lucide-react';
@@ -31,6 +34,12 @@ export function ProductDetail() {
 
     const productId = parseInt(id || '0');
     const { data: product, isLoading, isError } = useProduct(productId);
+    const { data: orders, isLoading: isLoadingOrders } = useOrders({
+        product_id: productId,
+        page_size: 5,
+        sort_by: 'order_date',
+        sort_order: 'desc'
+    });
     const deleteMutation = useDeleteProduct();
 
     const handleDelete = async () => {
@@ -220,15 +229,52 @@ export function ProductDetail() {
                     </Card>
                 )}
 
-                {/* Recent Orders Placeholder */}
+                {/* Recent Orders */}
                 <Card className="md:col-span-3">
                     <CardHeader>
                         <CardTitle>Recent Orders</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-muted-foreground italic">
-                            Order history will be available after implementing the Orders module.
-                        </p>
+                        <DataTable
+                            columns={[
+                                {
+                                    key: 'order_id',
+                                    header: 'Order #',
+                                    className: 'w-[100px]'
+                                },
+                                {
+                                    key: 'customer.company_name',
+                                    header: 'Customer',
+                                    render: (order: any) => (
+                                        <Link to={`/customers/${order.customer?.customer_id}`} className="hover:underline font-medium">
+                                            {order.customer?.company_name || 'N/A'}
+                                        </Link>
+                                    )
+                                },
+                                {
+                                    key: 'order_date',
+                                    header: 'Order Date',
+                                    render: (order: any) => formatDate(order.order_date),
+                                },
+                                {
+                                    key: 'status',
+                                    header: 'Status',
+                                    render: (order: any) => <OrderStatusBadge status={order.status} />,
+                                },
+                                {
+                                    key: 'total',
+                                    header: 'Total',
+                                    className: 'text-right',
+                                    render: (order: any) => (
+                                        <span className="font-semibold">{formatCurrency(order.total)}</span>
+                                    ),
+                                },
+                            ]}
+                            data={orders?.data || []}
+                            isLoading={isLoadingOrders}
+                            onRowClick={(order) => navigate(`/orders/${order.order_id}`)}
+                            emptyMessage="No recent orders found for this product."
+                        />
                     </CardContent>
                 </Card>
             </div>

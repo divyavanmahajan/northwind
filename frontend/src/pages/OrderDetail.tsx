@@ -5,12 +5,23 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { OrderStatusBadge } from '@/components/features/orders/OrderStatusBadge';
 import { OrderStatusSelect } from '@/components/features/orders/OrderStatusSelect';
 import { RoleGate } from '@/components/auth/RoleGate';
-import { useOrder, useUpdateOrderStatus } from '@/hooks/useOrders';
+import { useOrder, useUpdateOrderStatus, useDeleteOrder } from '@/hooks/useOrders';
 import { formatDate, formatCurrency } from '@/lib/utils';
-import { Printer, Pencil, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Printer, Pencil, ArrowLeft, AlertCircle, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { PageLoading } from '@/components/common/Skeletons';
 import { EmptyState } from '@/components/common/EmptyState';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import type { OrderStatus } from '@/types/order';
 
 export function OrderDetail() {
@@ -18,6 +29,23 @@ export function OrderDetail() {
     const navigate = useNavigate();
     const { data: order, isLoading, isError } = useOrder(parseInt(id!));
     const updateStatus = useUpdateOrderStatus();
+    const deleteOrderMutation = useDeleteOrder();
+
+    const handleDelete = async () => {
+        const promise = deleteOrderMutation.mutateAsync(parseInt(id!));
+
+        toast.promise(promise, {
+            loading: 'Deleting order...',
+            success: () => {
+                navigate('/orders');
+                return 'Order deleted successfully';
+            },
+            error: (err) => {
+                const apiError = err.response?.data?.detail || err.message;
+                return `Failed to delete order: ${apiError}`;
+            },
+        });
+    };
 
     if (isLoading) return <PageLoading />;
     if (isError || !order) {
@@ -83,6 +111,31 @@ export function OrderDetail() {
                             <Pencil className="h-4 w-4 mr-2" />
                             Edit
                         </Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive">
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Are you sure you want to delete order #{id}? This action cannot be undone.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={handleDelete}
+                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                        Delete Order
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </div>
                 </RoleGate>
             </div>

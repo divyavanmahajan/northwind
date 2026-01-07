@@ -116,6 +116,7 @@ export interface OrderFilterParams extends PaginationParams {
     status?: OrderStatus;
     customer_id?: string;
     employee_id?: number;
+    product_id?: number;
     date_from?: string;
     date_to?: string;
     sort_by?: string;

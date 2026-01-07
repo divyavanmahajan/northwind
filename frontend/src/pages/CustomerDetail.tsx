@@ -1,16 +1,27 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCustomer, useCustomerOrders } from '@/hooks/useCustomers';
+import { useCustomer, useCustomerOrders, useDeleteCustomer } from '@/hooks/useCustomers';
 import { CustomerStats } from '@/components/features/customers/CustomerStats';
 import { DataTable } from '@/components/common/DataTable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { RoleGate } from '@/components/auth/RoleGate';
-import { Pencil } from 'lucide-react';
+import { Pencil, Trash2, AlertCircle } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { PageLoading } from '@/components/common/Skeletons';
 import { EmptyState } from '@/components/common/EmptyState';
-import { AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export function CustomerDetail() {
     const { id } = useParams<{ id: string }>();
@@ -19,6 +30,22 @@ export function CustomerDetail() {
 
     const { data: customer, isLoading } = useCustomer(customerId);
     const { data: orders } = useCustomerOrders(customerId, { page_size: 10 });
+    const deleteMutation = useDeleteCustomer();
+
+    const handleDelete = async () => {
+        const promise = deleteMutation.mutateAsync(customerId);
+        toast.promise(promise, {
+            loading: 'Deleting customer...',
+            success: () => {
+                navigate('/customers');
+                return 'Customer deleted successfully';
+            },
+            error: (err) => {
+                const apiError = err.response?.data?.detail || err.message;
+                return `Failed to delete customer: ${apiError}`;
+            },
+        });
+    };
 
     if (isLoading) return <PageLoading />;
     if (!customer) {
@@ -50,10 +77,37 @@ export function CustomerDetail() {
                     </p>
                 </div>
                 <RoleGate roles={['admin', 'manager']}>
-                    <Button onClick={() => navigate(`/customers/${customer.customer_id}/edit`)}>
-                        <Pencil className="mr-2 h-4 w-4" />
-                        Edit
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => navigate(`/customers/${customer.customer_id}/edit`)}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Edit
+                        </Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive">
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This will soft-delete the customer. This action cannot be undone.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={handleDelete}
+                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                        Delete Customer
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </div>
                 </RoleGate>
             </div>
 

@@ -158,74 +158,75 @@ export function Customers() {
                             </AlertDialog>
                         </>
                     )}
-                    ),
+                </div>
+            ),
         },
-                    ];
+    ];
 
-                    if (isError) {
+    if (isError) {
         return (
-                    <EmptyState
-                        title="Error loading customers"
-                        description="We encountered an issue while fetching the customer list."
-                        icon={AlertCircle}
-                        action={{ label: "Retry", onClick: () => window.location.reload() }}
-                    />
-                    );
+            <EmptyState
+                title="Error loading customers"
+                description="We encountered an issue while fetching the customer list."
+                icon={AlertCircle}
+                action={{ label: "Retry", onClick: () => window.location.reload() }}
+            />
+        );
     }
 
-                    return (
-                    <div className="space-y-6">
-                        <div className="flex justify-between items-center">
-                            <div>
-                                <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
-                                <p className="text-muted-foreground">
-                                    Manage your customer database.
-                                </p>
-                            </div>
-                            {isAdminOrManager && (
-                                <Button asChild>
-                                    <Link to="/customers/new">
-                                        <Plus className="mr-2 h-4 w-4" /> Add Customer
-                                    </Link>
-                                </Button>
-                            )}
-                        </div>
+    return (
+        <div className="space-y-6">
+            <div className="flex justify-between items-center">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
+                    <p className="text-muted-foreground">
+                        Manage your customer database.
+                    </p>
+                </div>
+                {isAdminOrManager && (
+                    <Button asChild>
+                        <Link to="/customers/new">
+                            <Plus className="mr-2 h-4 w-4" /> Add Customer
+                        </Link>
+                    </Button>
+                )}
+            </div>
 
-                        <div className="space-y-4">
-                            <div className="flex gap-4">
-                                <div className="flex-1">
-                                    <Input
-                                        placeholder="Search customers..."
-                                        value={search}
-                                        onChange={(e) => updateParams({ search: e.target.value })}
-                                        className="max-w-sm"
-                                    />
-                                </div>
-                            </div>
-
-                            <DataTable
-                                columns={columns}
-                                data={data?.data || []}
-                                isLoading={isLoading}
-                                onSort={(key, order) => {
-                                    updateParams({ sort_by: key, sort_order: order });
-                                }}
-                                sortBy={sortBy}
-                                sortOrder={sortOrder}
-                                onRowClick={(customer) => navigate(`/customers/${customer.customer_id}`)}
-                            />
-
-                            {data?.pagination && (
-                                <Pagination
-                                    page={data.pagination.page}
-                                    pageSize={data.pagination.page_size}
-                                    totalItems={data.pagination.total_items}
-                                    totalPages={data.pagination.total_pages}
-                                    onPageChange={(newPage) => updateParams({ page: newPage })}
-                                    onPageSizeChange={(newSize) => updateParams({ page_size: newSize, page: 1 })}
-                                />
-                            )}
-                        </div>
+            <div className="space-y-4">
+                <div className="flex gap-4">
+                    <div className="flex-1">
+                        <Input
+                            placeholder="Search customers..."
+                            value={search}
+                            onChange={(e) => updateParams({ search: e.target.value })}
+                            className="max-w-sm"
+                        />
                     </div>
-                    );
+                </div>
+
+                <DataTable
+                    columns={columns}
+                    data={data?.data || []}
+                    isLoading={isLoading}
+                    onSort={(key, order) => {
+                        updateParams({ sort_by: key, sort_order: order });
+                    }}
+                    sortBy={sortBy}
+                    sortOrder={sortOrder}
+                    onRowClick={(customer) => navigate(`/customers/${customer.customer_id}`)}
+                />
+
+                {data?.pagination && (
+                    <Pagination
+                        page={data.pagination.page}
+                        pageSize={data.pagination.page_size}
+                        totalItems={data.pagination.total_items}
+                        totalPages={data.pagination.total_pages}
+                        onPageChange={(newPage) => updateParams({ page: newPage })}
+                        onPageSizeChange={(newSize) => updateParams({ page_size: newSize, page: 1 })}
+                    />
+                )}
+            </div>
+        </div>
+    );
 }

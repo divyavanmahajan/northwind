@@ -1,9 +1,21 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEmployee } from '@/hooks/useEmployees';
+import { useEmployee, useEmployeeMutations } from '@/hooks/useEmployees';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Edit } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { formatCurrency } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
 import { UserRole } from '@/types/user';
@@ -26,8 +38,25 @@ export function EmployeeDetail() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { data: employee, isLoading, isError } = useEmployee(parseInt(id!));
+    const { deleteEmployee } = useEmployeeMutations();
     const { user } = useAuthStore();
     const isAdminOrManager = user?.role === UserRole.ADMIN || user?.role === UserRole.MANAGER;
+
+    const handleDelete = async () => {
+        const promise = deleteEmployee.mutateAsync(parseInt(id!));
+
+        toast.promise(promise, {
+            loading: 'Deleting employee...',
+            success: () => {
+                navigate('/employees');
+                return 'Employee deleted successfully';
+            },
+            error: (err) => {
+                const apiError = err.response?.data?.detail || err.message;
+                return `Failed to delete employee: ${apiError}`;
+            },
+        });
+    };
 
     if (isLoading) return <PageLoading />;
     if (isError || !employee) {
@@ -54,9 +83,35 @@ export function EmployeeDetail() {
                     </div>
                 </div>
                 {isAdminOrManager && (
-                    <Button onClick={() => navigate(`/employees/${id}/edit`)}>
-                        <Edit className="h-4 w-4 mr-2" /> Edit
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => navigate(`/employees/${id}/edit`)}>
+                            <Edit className="h-4 w-4 mr-2" /> Edit
+                        </Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive">
+                                    <Trash2 className="h-4 w-4 mr-2" /> Delete
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This will soft-delete the employee. This action cannot be undone.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={handleDelete}
+                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                        Delete Employee
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </div>
                 )}
             </div>
 

@@ -21,6 +21,7 @@ def list_orders(
     page_size: int = Query(25, ge=1, le=100),
     status: Optional[OrderStatus] = Query(None),
     customer_id: Optional[str] = Query(None),
+    product_id: Optional[int] = Query(None),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -29,7 +30,8 @@ def list_orders(
         page=page, 
         page_size=page_size, 
         status=status,
-        customer_id=customer_id
+        customer_id=customer_id,
+        product_id=product_id
     )
     
     return PaginatedResponse(

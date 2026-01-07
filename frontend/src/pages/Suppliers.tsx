@@ -190,6 +190,7 @@ export function Suppliers() {
                     }}
                     sortBy={sortBy}
                     sortOrder={sortOrder}
+                    onRowClick={(supplier) => navigate(`/suppliers/${supplier.supplier_id}`)}
                 />
 
                 {data?.pagination && (

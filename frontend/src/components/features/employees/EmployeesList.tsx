@@ -180,6 +180,7 @@ export function EmployeesList() {
                 }}
                 sortBy={sortBy}
                 sortOrder={sortOrder}
+                onRowClick={(emp) => navigate(`/employees/${emp.employee_id}`)}
             />
 
             {employees?.pagination && (

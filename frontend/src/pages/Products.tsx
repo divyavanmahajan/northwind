@@ -244,6 +244,7 @@ export function Products() {
                     }}
                     sortBy={sortBy}
                     sortOrder={sortOrder}
+                    onRowClick={(product) => navigate(`/products/${product.product_id}`)}
                 />
 
                 {data?.pagination && (
