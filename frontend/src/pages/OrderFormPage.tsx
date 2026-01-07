@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -50,29 +50,35 @@ export function OrderFormPage() {
 
     const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<OrderFormData>({
         resolver: zodResolver(orderSchema),
+        defaultValues: {
+            customer_id: '',
+            employee_id: null,
+            freight: 0,
+        }
     });
 
     // Populate form when data is loaded
     useEffect(() => {
         if (order) {
             reset({
-                customer_id: order.customer.customer_id,
-                employee_id: order.employee?.employee_id,
+                customer_id: order.customer?.customer_id,
+                employee_id: order.employee?.employee_id || null,
                 ship_name: order.ship_name || '',
                 ship_address: order.ship_address || '',
                 ship_city: order.ship_city || '',
                 ship_region: order.ship_region || '',
                 ship_postal_code: order.ship_postal_code || '',
                 ship_country: order.ship_country || '',
-                freight: order.freight,
+                freight: Number(order.freight),
             });
 
             if (order.order_details && order.order_details.length > 0) {
-                setOrderDetails(order.order_details.map(d => ({
+                const details = order.order_details.map(d => ({
                     product_id: d.product_id,
                     quantity: d.quantity,
                     discount: Number(d.discount)
-                })));
+                }));
+                setOrderDetails(details);
             }
         }
     }, [order, reset]);
@@ -100,7 +106,7 @@ export function OrderFormPage() {
         });
     };
 
-    if (isEdit && !order) return <PageLoading />;
+    if ((isEdit && !order) || !customersData || !employeesData || !productsData) return <PageLoading />;
 
     const addItem = () => {
         setOrderDetails([...orderDetails, { product_id: 0, quantity: 1, discount: 0 }]);
@@ -133,7 +139,10 @@ export function OrderFormPage() {
                     <CardContent className="space-y-4">
                         <div>
                             <Label htmlFor="customer_id">Customer *</Label>
-                            <Select onValueChange={(v) => setValue('customer_id', v)} value={watch('customer_id')}>
+                            <Select
+                                value={watch('customer_id') || ''}
+                                onValueChange={(v) => setValue('customer_id', v, { shouldValidate: true })}
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select customer" />
                                 </SelectTrigger>
@@ -150,12 +159,15 @@ export function OrderFormPage() {
 
                         <div>
                             <Label htmlFor="employee_id">Employee</Label>
-                            <Select onValueChange={(v) => setValue('employee_id', parseInt(v))} value={watch('employee_id')?.toString() || 'NONE'}>
+                            <Select
+                                value={watch('employee_id') !== null && watch('employee_id') !== undefined ? watch('employee_id').toString() : 'UNASSIGNED'}
+                                onValueChange={(v) => setValue('employee_id', (v === 'UNASSIGNED' || v === '') ? null : parseInt(v), { shouldValidate: true })}
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select employee" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="NONE">Unassigned</SelectItem>
+                                    <SelectItem value="UNASSIGNED">Unassigned</SelectItem>
                                     {employeesData?.data.map((e) => (
                                         <SelectItem key={e.employee_id} value={e.employee_id.toString()}>
                                             {e.first_name} {e.last_name}
@@ -182,8 +194,8 @@ export function OrderFormPage() {
                                 <div className="flex-1">
                                     <Label>Product</Label>
                                     <Select
-                                        value={item.product_id.toString()}
-                                        onValueChange={(v) => updateItem(index, 'product_id', parseInt(v))}
+                                        value={item.product_id && item.product_id > 0 ? item.product_id.toString() : ''}
+                                        onValueChange={(v) => updateItem(index, 'product_id', v ? parseInt(v) : 0)}
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select product" />
