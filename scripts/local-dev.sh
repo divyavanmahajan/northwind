@@ -90,13 +90,9 @@ start_frontend() {
     
     # Check if frontend is running
     if is_port_in_use 5173; then
-        print_info "✓ Frontend is running at http://localhost:5173"
-    elif is_port_in_use 5174; then
-        print_info "✓ Frontend is running at http://localhost:5174"
-    elif is_port_in_use 5175; then
-        print_info "✓ Frontend is running at http://localhost:5175"
+        print_info "✓ Local Vite dev server is running at http://localhost:5173"
     else
-        print_warn "Frontend may still be starting up. Check logs/frontend.log"
+        print_warn "Local Vite dev server may still be starting up. Check logs/frontend.log"
     fi
 }
 
@@ -138,15 +134,18 @@ show_status() {
         print_warn "✗ Database (PostgreSQL): Not running"
     fi
     
-    # Frontend status
-    if is_port_in_use 5173; then
-        print_info "✓ Frontend (Vite): Running on http://localhost:5173"
-    elif is_port_in_use 5174; then
-        print_info "✓ Frontend (Vite): Running on http://localhost:5174"
-    elif is_port_in_use 5175; then
-        print_info "✓ Frontend (Vite): Running on http://localhost:5175"
+    # Docker Frontend status
+    if docker-compose ps | grep -q "northwind-frontend.*Up"; then
+        print_info "✓ Frontend (Docker Container): Running on http://localhost:15173"
     else
-        print_warn "✗ Frontend (Vite): Not running"
+        print_warn "✗ Frontend (Docker Container): Not running"
+    fi
+    
+    # Local Vite Frontend status
+    if is_port_in_use 5173; then
+        print_info "✓ Frontend (Local Vite Dev): Running on http://localhost:5173"
+    else
+        print_warn "✗ Frontend (Local Vite Dev): Not running"
     fi
     
     echo ""
