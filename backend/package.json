@@ -1,0 +1,10 @@
+{
+    "name": "northwind-backend",
+    "version": "1.0.0",
+    "description": "Northwind FastAPI Backend",
+    "scripts": {
+        "test": "pytest",
+        "test:coverage": "pytest --cov=app --cov-report=html",
+        "test:ci": "pytest --cov=app --cov-report=xml"
+    }
+}

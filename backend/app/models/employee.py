@@ -29,5 +29,9 @@ class Employee(Base, TimestampMixin, SoftDeleteMixin):
     reports = relationship("Employee", back_populates="manager", lazy="dynamic")
     orders = relationship("Order", back_populates="employee", lazy="dynamic")
     
+    @property
+    def full_name(self) -> str:
+        return f"{self.first_name} {self.last_name}"
+    
     def __repr__(self):
-        return f"<Employee {self.last_name}, {self.first_name}>"
+        return f"<Employee {self.full_name}>"

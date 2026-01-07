@@ -32,7 +32,7 @@ class DashboardService:
         query = self.db.query(
             func.count(func.distinct(Order.order_id)),
             func.coalesce(func.sum(OrderDetail.unit_price * OrderDetail.quantity * (1 - OrderDetail.discount)), 0)
-        ).join(OrderDetail).filter(
+        ).select_from(Order).join(OrderDetail).filter(
             Order.order_date >= start,
             Order.order_date <= end,
             Order.deleted_at.is_(None)
@@ -74,15 +74,21 @@ class DashboardService:
         )
     
     def get_revenue_trend(self, start: date, end: date) -> List[RevenueByPeriod]:
+        # Handle different date formatting based on dialect
+        if self.db.bind.dialect.name == "postgresql":
+            period_func = func.to_char(Order.order_date, 'YYYY-MM')
+        else:
+            period_func = func.strftime('%Y-%m', Order.order_date)
+
         results = self.db.query(
-            func.to_char(Order.order_date, 'YYYY-MM').label('period'),
+            period_func.label('period'),
             func.coalesce(func.sum(OrderDetail.unit_price * OrderDetail.quantity * (1 - OrderDetail.discount)), 0).label('revenue'),
             func.count(func.distinct(Order.order_id)).label('orders')
-        ).join(OrderDetail).filter(
+        ).select_from(Order).join(OrderDetail).filter(
             Order.order_date >= start,
             Order.order_date <= end,
             Order.deleted_at.is_(None)
-        ).group_by('period').order_by('period').all()
+        ).group_by(period_func).order_by(period_func).all()
         
         return [RevenueByPeriod(period=r.period, revenue=Decimal(str(r.revenue)), orders=r.orders) for r in results]
     
@@ -105,7 +111,7 @@ class DashboardService:
             Product.product_name,
             func.sum(OrderDetail.quantity).label('total_qty'),
             func.sum(OrderDetail.unit_price * OrderDetail.quantity * (1 - OrderDetail.discount)).label('revenue')
-        ).join(OrderDetail).join(Order).filter(
+        ).select_from(Product).join(OrderDetail).join(Order).filter(
             Order.deleted_at.is_(None)
         )
         
@@ -129,7 +135,7 @@ class DashboardService:
             Customer.company_name,
             func.count(func.distinct(Order.order_id)).label('total_orders'),
             func.coalesce(func.sum(OrderDetail.unit_price * OrderDetail.quantity * (1 - OrderDetail.discount)), 0).label('total_spent')
-        ).join(Order).join(OrderDetail).filter(
+        ).select_from(Customer).join(Order).join(OrderDetail).filter(
             Order.deleted_at.is_(None)
         ).group_by(Customer.customer_id, Customer.company_name
         ).order_by(func.sum(OrderDetail.unit_price * OrderDetail.quantity * (1 - OrderDetail.discount)).desc()
