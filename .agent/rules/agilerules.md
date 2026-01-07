@@ -1,0 +1,66 @@
+---
+trigger: always_on
+---
+
+# Northwind Project Rules
+
+## Agile Development Workflow
+
+**IMPORTANT**: All code changes must follow the agile workflow defined in `docs/agileguide.md`.
+
+### Before Making Any Code Changes:
+
+1. **Create a GitHub Issue First**
+   - Use `mcp_github_issue_write` tool to create an issue
+   - Repository: `divyavanmahajan/northwind`
+   - Include clear title, description, and acceptance criteria
+   - Assign appropriate labels (`bug`, `enhancement`, `feature`, `documentation`)
+   - Notify the user of the created issue number
+
+2. **Branch Naming**
+   - Format: `feature/issue-number-description` or `bugfix/issue-number-description`
+   - Example: `feature/3-readme-screenshots`
+
+3. **Commit Messages**
+   - Format: `action(scope): description (closes #issue-number)`
+   - Example: `docs(readme): add overview section with screenshots (closes #3)`
+   - Common actions: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
+
+4. **Pull Requests**
+   - Create PR from feature/bugfix branch to `main`
+   - Link the issue in PR description (e.g., "Fixes #3")
+   - Ensure all tests pass
+
+### Issue Types:
+- **User Story (Feature)**: New functionality from user's perspective
+- **Bug**: Error or fault causing incorrect results
+- **Enhancement**: Improvements to existing features
+- **Task**: Maintenance or infrastructure work
+
+### Workflow Summary:
+1. User requests a change
+2. **Create GitHub issue** (don't skip this!)
+3. Create feature/bugfix branch
+4. Implement changes
+5. Commit with issue reference
+6. Create PR linking to issue
+7. Merge to main
+
+## Project-Specific Guidelines
+
+### Tech Stack
+- **Backend**: FastAPI (Python 3.11), SQLAlchemy, PostgreSQL
+- **Frontend**: React 18, TypeScript, Vite, Tailwind CSS
+- **Testing**: Pytest (backend), Playwright (E2E)
+- **Infrastructure**: Docker, Docker Compose
+
+### Code Quality
+- Maintain 80%+ backend test coverage
+- Follow TypeScript strict mode
+- Use ESLint and Prettier for frontend
+- Use Black and Flake8 for backend
+
+### Default Credentials
+- Admin: admin@northwind.com / Admin123!
+- Manager: manager@northwind.com / Manager123!
+- Employee: employee@northwind.com / Employee123!
