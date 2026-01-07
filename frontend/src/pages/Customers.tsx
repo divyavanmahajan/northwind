@@ -1,15 +1,15 @@
-import { useState, useCallback } from 'react';
-import { useNavigate, useSearchParams, Navigate } from 'react-router-dom';
+import { useCallback } from 'react';
+import { useNavigate, useSearchParams, Link, Navigate } from 'react-router-dom';
 import { useCustomers, useDeleteCustomer } from '@/hooks/useCustomers';
 import { DataTable } from '@/components/common/DataTable';
 import { Pagination } from '@/components/common/Pagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Edit, Trash2, Eye } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import { UserRole } from '@/types/user';
+import { EmptyState } from '@/components/common/EmptyState';
+import { AlertCircle, Plus, Edit, Trash2, Eye } from 'lucide-react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -79,12 +79,16 @@ export function Customers() {
     );
 
     const handleDelete = async (id: string) => {
-        try {
-            await deleteMutation.mutateAsync(id);
-            toast.success('Customer deleted successfully');
-        } catch (error: any) {
-            toast.error('Failed to delete customer');
-        }
+        const promise = deleteMutation.mutateAsync(id);
+
+        toast.promise(promise, {
+            loading: 'Deleting customer...',
+            success: 'Customer deleted successfully',
+            error: (err) => {
+                const apiError = err.response?.data?.detail || err.message;
+                return `Failed to delete customer: ${apiError} `;
+            },
+        });
     };
 
     const columns = [
@@ -103,7 +107,7 @@ export function Customers() {
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => navigate(`/customers/${customer.customer_id}`)}
+                        onClick={() => navigate(`/ customers / ${customer.customer_id} `)}
                     >
                         <Eye className="h-4 w-4" />
                     </Button>
@@ -112,10 +116,10 @@ export function Customers() {
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => navigate(`/customers/${customer.customer_id}/edit`)}
+                                onClick={() => navigate(`/ customers / ${customer.customer_id}/edit`)}
                             >
                                 <Edit className="h-4 w-4" />
-                            </Button>
+                            </Button >
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                     <Button
@@ -146,12 +150,21 @@ export function Customers() {
                             </AlertDialog>
                         </>
                     )}
-                </div>
+                </div >
             ),
         },
     ];
 
-    if (isError) return <div>Error loading customers</div>;
+    if (isError) {
+        return (
+            <EmptyState
+                title="Error loading customers"
+                description="We encountered an issue while fetching the customer list."
+                icon={AlertCircle}
+                action={{ label: "Retry", onClick: () => window.location.reload() }}
+            />
+        );
+    }
 
     return (
         <div className="space-y-6">

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useProducts, useDeleteProduct } from '@/hooks/useProducts';
 import { DataTable } from '@/components/common/DataTable';
@@ -7,12 +7,13 @@ import { ProductFilterPanel } from '@/components/features/products/ProductFilter
 import { StockStatusBadge } from '@/components/features/products/StockStatusBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import { UserRole } from '@/types/user';
 import { formatCurrency } from '@/lib/utils';
+import { EmptyState } from '@/components/common/EmptyState';
+import { AlertCircle, Plus, Edit, Trash2, Eye } from 'lucide-react';
 import type { ProductFilters } from '@/types/product';
 import {
     AlertDialog,
@@ -102,12 +103,16 @@ export function Products() {
     };
 
     const handleDelete = async (id: number) => {
-        try {
-            await deleteMutation.mutateAsync(id);
-            toast.success('Product deleted successfully');
-        } catch (error: any) {
-            toast.error(error.response?.data?.error?.message || 'Failed to delete product');
-        }
+        const promise = deleteMutation.mutateAsync(id);
+
+        toast.promise(promise, {
+            loading: 'Deleting product...',
+            success: 'Product deleted successfully',
+            error: (err) => {
+                const apiError = err.response?.data?.detail || err.message;
+                return `Failed to delete product: ${apiError}`;
+            },
+        });
     };
 
     const columns = [
@@ -184,7 +189,16 @@ export function Products() {
         },
     ];
 
-    if (isError) return <div>Error loading products</div>;
+    if (isError) {
+        return (
+            <EmptyState
+                title="Error loading products"
+                description="We encountered an issue while fetching the product list."
+                icon={AlertCircle}
+                action={{ label: "Retry", onClick: () => window.location.reload() }}
+            />
+        );
+    }
 
     return (
         <div className="space-y-6">

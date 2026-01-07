@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import {
     useUsers,
     useCreateUser,
@@ -94,22 +94,30 @@ export function Users() {
     const [newPassword, setNewPassword] = useState('');
 
     const handleCreateUser = async (values: any) => {
+        const promise = createUserMutation.mutateAsync(values);
+        toast.promise(promise, {
+            loading: 'Creating user...',
+            success: 'User created successfully',
+            error: (err) => err.response?.data?.detail || 'Failed to create user',
+        });
         try {
-            await createUserMutation.mutateAsync(values);
+            await promise;
             setIsCreateDialogOpen(false);
-        } catch (error) {
-            // Error handled by hook toast
-        }
+        } catch (error) { }
     };
 
     const handleUpdateUser = async (values: any) => {
         if (!editingUser) return;
+        const promise = updateUserMutation.mutateAsync({ id: editingUser.user_id, data: values });
+        toast.promise(promise, {
+            loading: 'Updating user...',
+            success: 'User updated successfully',
+            error: (err) => err.response?.data?.detail || 'Failed to update user',
+        });
         try {
-            await updateUserMutation.mutateAsync({ id: editingUser.user_id, data: values });
+            await promise;
             setEditingUser(null);
-        } catch (error) {
-            // Error handled by hook toast
-        }
+        } catch (error) { }
     };
 
     const handleToggleActive = async (user: UserListItem) => {
@@ -117,15 +125,15 @@ export function Users() {
             toast.error('Cannot deactivate your own account');
             return;
         }
-        try {
-            if (user.is_active) {
-                await deactivateMutation.mutateAsync(user.user_id);
-            } else {
-                await activateMutation.mutateAsync(user.user_id);
-            }
-        } catch (error) {
-            // Error handled by hook toast
-        }
+        const promise = user.is_active
+            ? deactivateMutation.mutateAsync(user.user_id)
+            : activateMutation.mutateAsync(user.user_id);
+
+        toast.promise(promise, {
+            loading: user.is_active ? 'Deactivating user...' : 'Activating user...',
+            success: `User ${user.is_active ? 'deactivated' : 'activated'} successfully`,
+            error: (err) => err.response?.data?.detail || `Failed to ${user.is_active ? 'deactivate' : 'activate'} user`,
+        });
     };
 
     const handleResetPassword = async () => {
@@ -134,16 +142,20 @@ export function Users() {
             toast.error('Password must be at least 8 characters');
             return;
         }
+        const promise = resetPasswordMutation.mutateAsync({
+            id: resettingUser.user_id,
+            data: { new_password: newPassword }
+        });
+        toast.promise(promise, {
+            loading: 'Resetting password...',
+            success: 'Password reset successfully',
+            error: (err) => err.response?.data?.detail || 'Failed to reset password',
+        });
         try {
-            await resetPasswordMutation.mutateAsync({
-                id: resettingUser.user_id,
-                data: { new_password: newPassword }
-            });
+            await promise;
             setResettingUser(null);
             setNewPassword('');
-        } catch (error) {
-            // Error handled by hook toast
-        }
+        } catch (error) { }
     };
 
     const handleDeleteUser = async () => {
@@ -152,12 +164,16 @@ export function Users() {
             toast.error('Cannot delete your own account');
             return;
         }
+        const promise = deleteMutation.mutateAsync(deletingUser.user_id);
+        toast.promise(promise, {
+            loading: 'Deleting user...',
+            success: 'User deleted successfully',
+            error: (err) => err.response?.data?.detail || 'Failed to delete user',
+        });
         try {
-            await deleteMutation.mutateAsync(deletingUser.user_id);
+            await promise;
             setDeletingUser(null);
-        } catch (error) {
-            // Error handled by hook toast
-        }
+        } catch (error) { }
     };
 
     const columns = [

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CategoryForm } from '../CategoryForm';
 import type { Category } from '@/types/category';
@@ -11,7 +11,7 @@ describe('CategoryForm', () => {
     const defaultProps = {
         onSubmit: mockOnSubmit,
         onCancel: mockOnCancel,
-        isSubmitting: false,
+        isLoading: false,
     };
 
     beforeEach(() => {
@@ -155,9 +155,9 @@ describe('CategoryForm', () => {
     });
 
     it('should disable submit button when submitting', () => {
-        render(<CategoryForm {...defaultProps} isSubmitting={true} />);
+        render(<CategoryForm {...defaultProps} isLoading={true} />);
 
-        const submitButton = screen.getByRole('button', { name: /creating/i });
+        const submitButton = screen.getByRole('button', { name: /saving/i });
         expect(submitButton).toBeDisabled();
     });
 

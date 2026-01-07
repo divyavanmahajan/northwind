@@ -1,4 +1,4 @@
-# Prompt 30: Docker Production & Documentation
+# Prompt 31: Docker Production & Documentation
 
 ## Context
 Final prompt - prepare for production deployment with Docker and documentation.
@@ -115,7 +115,7 @@ All 30 implementation prompts have been created. The project is organized into 6
 **Phase 5: Advanced Features (Prompts 23-26)**
 - Data seeding, dashboards, user management
 
-**Phase 6: Polish & Deploy (Prompts 27-30)**
-- E2E tests, coverage, UI polish, production deployment
+**Phase 6: Polish & Deploy (Prompts 27-31)**
+- E2E tests, coverage, UI polish, Storybook, production deployment
 
 Each prompt is self-contained with clear goals, code examples, verification steps, and success criteria.

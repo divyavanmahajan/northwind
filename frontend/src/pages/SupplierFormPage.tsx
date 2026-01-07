@@ -4,6 +4,7 @@ import { SupplierForm } from '@/components/features/suppliers/SupplierForm';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import { PageLoading } from '@/components/common/Skeletons';
 
 export function SupplierFormPage() {
     const { id } = useParams<{ id: string }>();
@@ -16,21 +17,24 @@ export function SupplierFormPage() {
     const updateMutation = useUpdateSupplier(supplierId);
 
     const handleSubmit = async (data: any) => {
-        try {
-            if (isEdit) {
-                await updateMutation.mutateAsync(data);
-                toast.success('Supplier updated successfully');
-            } else {
-                await createMutation.mutateAsync(data);
-                toast.success('Supplier created successfully');
-            }
-            navigate('/suppliers');
-        } catch (error: any) {
-            toast.error(error.response?.data?.error?.message || 'Failed to save supplier');
-        }
+        const promise = isEdit
+            ? updateMutation.mutateAsync(data)
+            : createMutation.mutateAsync(data);
+
+        toast.promise(promise, {
+            loading: isEdit ? 'Updating supplier...' : 'Creating supplier...',
+            success: (res) => {
+                navigate('/suppliers');
+                return `Supplier "${res.company_name}" ${isEdit ? 'updated' : 'created'} successfully`;
+            },
+            error: (err) => {
+                const apiError = err.response?.data?.detail || err.message;
+                return `Failed to ${isEdit ? 'update' : 'create'} supplier: ${apiError}`;
+            },
+        });
     };
 
-    if (isEdit && isFetchLoading) return <div>Loading...</div>;
+    if (isEdit && isFetchLoading) return <PageLoading />;
 
     return (
         <div className="space-y-6">

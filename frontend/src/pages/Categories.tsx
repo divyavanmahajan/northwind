@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from '@/hooks/useCategories';
 import { DataTable } from '@/components/common/DataTable';
 import { Pagination } from '@/components/common/Pagination';
@@ -75,18 +76,38 @@ export function Categories() {
     };
 
     const handleSubmit = async (formData: any) => {
-        if (editingCategory) {
-            await updateMutation.mutateAsync({ id: editingCategory.category_id, data: formData });
-        } else {
-            await createMutation.mutateAsync(formData);
-        }
-        setIsFormOpen(false);
+        const promise = editingCategory
+            ? updateMutation.mutateAsync({ id: editingCategory.category_id, data: formData })
+            : createMutation.mutateAsync(formData);
+
+        toast.promise(promise, {
+            loading: editingCategory ? 'Updating category...' : 'Creating category...',
+            success: (data) => {
+                setIsFormOpen(false);
+                return `Category "${data.category_name}" ${editingCategory ? 'updated' : 'created'} successfully`;
+            },
+            error: (err) => {
+                const apiError = err.response?.data?.detail || err.message;
+                return `Failed to ${editingCategory ? 'update' : 'create'} category: ${apiError}`;
+            },
+        });
     };
 
     const handleDelete = async () => {
         if (deletingCategory) {
-            await deleteMutation.mutateAsync(deletingCategory.category_id);
-            setDeletingCategory(null);
+            const promise = deleteMutation.mutateAsync(deletingCategory.category_id);
+
+            toast.promise(promise, {
+                loading: 'Deleting category...',
+                success: () => {
+                    setDeletingCategory(null);
+                    return `Category "${deletingCategory.category_name}" deleted successfully`;
+                },
+                error: (err) => {
+                    const apiError = err.response?.data?.detail || err.message;
+                    return `Failed to delete category: ${apiError}`;
+                },
+            });
         }
     };
 

@@ -39,7 +39,7 @@ interface UserFormProps {
 
 export function UserForm({ user, onSubmit, onCancel, isLoading }: UserFormProps) {
     const form = useForm<UserFormData>({
-        resolver: zodResolver(userSchema),
+        resolver: zodResolver(userSchema) as any,
         defaultValues: user ? {
             username: user.username,
             email: user.email,
@@ -82,7 +82,7 @@ export function UserForm({ user, onSubmit, onCancel, isLoading }: UserFormProps)
     };
 
     return (
-        <Form {...form}>
+        <Form {...(form as any)}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
                 <FormField
                     control={form.control}

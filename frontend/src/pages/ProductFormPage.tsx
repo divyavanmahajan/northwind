@@ -4,6 +4,8 @@ import { ProductForm } from '@/components/features/products/ProductForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { PageLoading } from '@/components/common/Skeletons';
 import type { ProductCreateInput } from '@/types/product';
 
 export function ProductFormPage() {
@@ -17,16 +19,21 @@ export function ProductFormPage() {
     const updateMutation = useUpdateProduct();
 
     const handleSubmit = async (data: ProductCreateInput) => {
-        try {
-            if (isEdit) {
-                await updateMutation.mutateAsync({ id: productId, data });
-            } else {
-                await createMutation.mutateAsync(data);
-            }
-            navigate('/products');
-        } catch (error) {
-            // Error handling is done in the mutation hooks
-        }
+        const promise = isEdit
+            ? updateMutation.mutateAsync({ id: productId, data })
+            : createMutation.mutateAsync(data);
+
+        toast.promise(promise, {
+            loading: isEdit ? 'Updating product...' : 'Creating product...',
+            success: (res) => {
+                navigate('/products');
+                return `Product "${res.product_name}" ${isEdit ? 'updated' : 'created'} successfully`;
+            },
+            error: (err) => {
+                const apiError = err.response?.data?.detail || err.message;
+                return `Failed to ${isEdit ? 'update' : 'create'} product: ${apiError}`;
+            },
+        });
     };
 
     const handleCancel = () => {
@@ -34,7 +41,7 @@ export function ProductFormPage() {
     };
 
     if (isEdit && isLoadingProduct) {
-        return <div>Loading...</div>;
+        return <PageLoading />;
     }
 
     return (

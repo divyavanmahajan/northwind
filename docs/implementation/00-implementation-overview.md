@@ -21,7 +21,7 @@ This document provides a detailed, step-by-step implementation plan for the Nort
 | 3 | Core Entities (Products, Categories, Suppliers) | 11-16 | ~4 days |
 | 4 | Business Entities (Customers, Orders, Employees) | 17-22 | ~5 days |
 | 5 | Advanced Features & Dashboards | 23-26 | ~3 days |
-| 6 | Polish, Testing & Deployment | 27-30 | ~4 days |
+| 6 | Polish, Testing & Deployment | 27-31 | ~4 days |
 
 ## Prompt Index
 
@@ -65,7 +65,8 @@ This document provides a detailed, step-by-step implementation plan for the Nort
 - **Prompt 27**: E2E Test Setup (Playwright)
 - **Prompt 28**: Backend Coverage & Final Tests
 - **Prompt 29**: UI Polish & Error Handling
-- **Prompt 30**: Docker Production & Documentation
+- **Prompt 30**: Storybook Integration
+- **Prompt 31**: Docker Production & Documentation
 
 ---
 

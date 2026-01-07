@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/button';
 import { RoleGate } from '@/components/auth/RoleGate';
 import { Pencil } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { PageLoading } from '@/components/common/Skeletons';
+import { EmptyState } from '@/components/common/EmptyState';
+import { AlertCircle } from 'lucide-react';
 
 export function CustomerDetail() {
     const { id } = useParams<{ id: string }>();
@@ -17,8 +20,17 @@ export function CustomerDetail() {
     const { data: customer, isLoading } = useCustomer(customerId);
     const { data: orders } = useCustomerOrders(customerId, { page_size: 10 });
 
-    if (isLoading) return <div>Loading...</div>;
-    if (!customer) return <div>Customer not found</div>;
+    if (isLoading) return <PageLoading />;
+    if (!customer) {
+        return (
+            <EmptyState
+                title="Customer not found"
+                description="The customer you are looking for does not exist or has been deleted."
+                icon={AlertCircle}
+                action={{ label: "Back to Customers", onClick: () => navigate('/customers') }}
+            />
+        );
+    }
 
     const orderColumns = [
         { key: 'order_id', header: 'Order ID' },

@@ -7,7 +7,9 @@ import { ManagerDashboard } from '@/components/features/dashboard/ManagerDashboa
 import { EmployeeDashboard } from '@/components/features/dashboard/EmployeeDashboard';
 import { CustomerDashboard } from '@/components/features/dashboard/CustomerDashboard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { PageLoading } from '@/components/common/Skeletons';
+import { EmptyState } from '@/components/common/EmptyState';
+import { AlertCircle } from 'lucide-react';
 
 export const Dashboard = () => {
   const { user } = useAuth();
@@ -38,26 +40,27 @@ export const Dashboard = () => {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground">Please log in to view your dashboard</p>
-      </div>
+      <EmptyState
+        title="Authentication required"
+        description="Please log in to view your dashboard"
+        action={{ label: "Login", onClick: () => window.location.href = "/login" }}
+      />
     );
   }
 
   const renderContent = () => {
     if (dashboardQuery.isLoading) {
-      return (
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      );
+      return <PageLoading />;
     }
 
     if (dashboardQuery.isError) {
       return (
-        <div className="flex items-center justify-center h-64">
-          <p className="text-destructive">Error loading dashboard. Please try again.</p>
-        </div>
+        <EmptyState
+          title="Error loading dashboard"
+          description="We couldn't load your dashboard data. This might be a temporary issue."
+          icon={AlertCircle}
+          action={{ label: "Try Again", onClick: () => dashboardQuery.refetch() }}
+        />
       );
     }
 

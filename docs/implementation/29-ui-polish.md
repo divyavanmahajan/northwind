@@ -64,4 +64,4 @@ SUCCESS CRITERIA:
 ---
 
 ## Next Step
-Proceed to [Prompt 30: Docker Production & Documentation](./30-docker-production.md)
+Proceed to [Prompt 30: Storybook Integration](./30-storybook.md)

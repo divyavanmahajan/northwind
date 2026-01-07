@@ -8,8 +8,20 @@ import { OrderStatusBadge } from '@/components/features/orders/OrderStatusBadge'
 import { useOrders, useDeleteOrder } from '@/hooks/useOrders';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDate, formatCurrency } from '@/lib/utils';
-import { Plus, Eye, Pencil, Trash2 } from 'lucide-react';
-import type { OrderStatus, Order, OrderListResponse } from '@/types/order';
+import { Plus, Eye, Pencil, Trash2, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import { EmptyState } from '@/components/common/EmptyState';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle
+} from '@/components/ui/alert-dialog';
+import type { OrderStatus, OrderListResponse } from '@/types/order';
 
 export function Orders() {
     const navigate = useNavigate();
@@ -17,7 +29,8 @@ export function Orders() {
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(25);
     const [statusFilter, setStatusFilter] = useState<OrderStatus | ''>('');
-    const { data, isLoading } = useOrders({
+    const [deletingOrderId, setDeletingOrderId] = useState<number | null>(null);
+    const { data, isLoading, isError } = useOrders({
         page,
         page_size: pageSize,
         status: statusFilter || undefined
@@ -64,11 +77,33 @@ export function Orders() {
         },
     ], []);
 
-    const handleDelete = (orderId: number) => {
-        if (confirm('Delete this order?')) {
-            deleteOrder.mutate(orderId);
-        }
+    const handleDelete = async () => {
+        if (!deletingOrderId) return;
+
+        const promise = deleteOrder.mutateAsync(deletingOrderId);
+
+        toast.promise(promise, {
+            loading: 'Deleting order...',
+            success: 'Order deleted successfully',
+            error: (err) => {
+                const apiError = err.response?.data?.detail || err.message;
+                return `Failed to delete order: ${apiError}`;
+            },
+        });
+
+        setDeletingOrderId(null);
     };
+
+    if (isError) {
+        return (
+            <EmptyState
+                title="Error loading orders"
+                description="We encountered an issue while fetching the order list."
+                icon={AlertCircle}
+                action={{ label: "Retry", onClick: () => window.location.reload() }}
+            />
+        );
+    }
 
     return (
         <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-in fade-in duration-500">
@@ -132,7 +167,7 @@ export function Orders() {
                                 size="icon"
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    handleDelete(order.order_id);
+                                    setDeletingOrderId(order.order_id);
                                 }}
                                 className="h-8 w-8 hover:text-destructive hover:bg-destructive/10"
                             >
@@ -158,6 +193,29 @@ export function Orders() {
                     </div>
                 )}
             </div>
+
+            <AlertDialog open={deletingOrderId !== null} onOpenChange={(open) => !open && setDeletingOrderId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Order</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete order #{deletingOrderId}? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={(e) => {
+                                e.preventDefault();
+                                handleDelete();
+                            }}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            Delete Order
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

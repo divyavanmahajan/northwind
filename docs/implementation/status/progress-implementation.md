@@ -30,5 +30,6 @@
 | 26 | User Management (Admin) | Completed |
 | 27 | E2E Test Setup (Playwright) | Completed |
 | 28 | Backend Coverage & Final Tests | Completed |
-| 29 | UI Polish & Error Handling | Pending |
-| 30 | Docker Production & Documentation | Pending |
+| 29 | UI Polish & Error Handling | Completed |
+| 30 | Storybook Integration | Pending |
+| 31 | Docker Production & Documentation | Pending |

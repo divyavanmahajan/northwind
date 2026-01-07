@@ -7,6 +7,9 @@ import { ArrowLeft, Edit } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
 import { UserRole } from '@/types/user';
+import { PageLoading } from '@/components/common/Skeletons';
+import { EmptyState } from '@/components/common/EmptyState';
+import { AlertCircle } from 'lucide-react';
 
 function StatCard({ title, value }: { title: string; value: string | number }) {
     return (
@@ -26,8 +29,17 @@ export function EmployeeDetail() {
     const { user } = useAuthStore();
     const isAdminOrManager = user?.role === UserRole.ADMIN || user?.role === UserRole.MANAGER;
 
-    if (isLoading) return <div>Loading...</div>;
-    if (isError || !employee) return <div>Employee not found</div>;
+    if (isLoading) return <PageLoading />;
+    if (isError || !employee) {
+        return (
+            <EmptyState
+                title="Employee not found"
+                description="The employee you are looking for does not exist or has been deleted."
+                icon={AlertCircle}
+                action={{ label: "Back to Employees", onClick: () => navigate('/employees') }}
+            />
+        );
+    }
 
     return (
         <div className="space-y-6">

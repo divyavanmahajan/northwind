@@ -3,12 +3,14 @@ import { useProduct, useDeleteProduct } from '@/hooks/useProducts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Trash2, ArrowLeft, Package, DollarSign, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import { UserRole } from '@/types/user';
 import { formatCurrency } from '@/lib/utils';
 import { StockStatusBadge } from '@/components/features/products/StockStatusBadge';
+import { PageLoading } from '@/components/common/Skeletons';
+import { EmptyState } from '@/components/common/EmptyState';
+import { AlertCircle, ArrowLeft, Edit, Trash2, Package, DollarSign, TrendingUp } from 'lucide-react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -46,8 +48,18 @@ export function ProductDetail() {
         toast.info('Discontinue functionality will be implemented');
     };
 
-    if (isLoading) return <div>Loading...</div>;
-    if (isError || !product) return <div>Product not found</div>;
+    if (isLoading) return <PageLoading />;
+
+    if (isError || !product) {
+        return (
+            <EmptyState
+                title="Product not found"
+                description="The product you are looking for might have been deleted or does not exist."
+                icon={AlertCircle}
+                action={{ label: "Back to Products", onClick: () => navigate('/products') }}
+            />
+        );
+    }
 
     return (
         <div className="space-y-6">

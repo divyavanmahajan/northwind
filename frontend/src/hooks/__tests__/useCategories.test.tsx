@@ -1,7 +1,8 @@
+
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import {
     useCategories,
     useCategory,
@@ -10,7 +11,7 @@ import {
     useDeleteCategory,
 } from '../useCategories';
 import { categoryService } from '@/services/categoryService';
-import type { CategoryCreate, CategoryUpdate } from '@/types/category';
+import type { Category, CategoryCreate, CategoryUpdate } from '@/types/category';
 
 // Mock the category service
 vi.mock('@/services/categoryService');
@@ -48,14 +49,16 @@ describe('useCategories', () => {
     it('should fetch categories successfully', async () => {
         const mockData = {
             data: [
-                { category_id: 1, category_name: 'Beverages', description: 'Soft drinks', product_count: 5 },
-                { category_id: 2, category_name: 'Condiments', description: 'Sauces', product_count: 3 },
+                { category_id: 1, category_name: 'Beverages', description: 'Soft drinks', product_count: 5, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' },
+                { category_id: 2, category_name: 'Condiments', description: 'Sauces', product_count: 3, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' },
             ],
             pagination: {
                 page: 1,
                 page_size: 25,
-                total: 2,
+                total_items: 2,
                 total_pages: 1,
+                has_next: false,
+                has_previous: false,
             },
         };
 
@@ -74,13 +77,15 @@ describe('useCategories', () => {
     it('should fetch categories with custom parameters', async () => {
         const mockData = {
             data: [
-                { category_id: 1, category_name: 'Beverages', description: 'Soft drinks', product_count: 5 },
+                { category_id: 1, category_name: 'Beverages', description: 'Soft drinks', product_count: 5, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' },
             ],
             pagination: {
                 page: 2,
                 page_size: 10,
-                total: 15,
+                total_items: 15,
                 total_pages: 2,
+                has_next: false,
+                has_previous: true,
             },
         };
 
@@ -173,9 +178,10 @@ describe('useCreateCategory', () => {
             description: 'New description',
         };
 
-        const mockResponse = {
+        const mockResponse: Category = {
             category_id: 3,
-            ...newCategory,
+            category_name: newCategory.category_name,
+            description: newCategory.description ?? null,
             product_count: 0,
             created_at: '2024-01-01T00:00:00Z',
             updated_at: '2024-01-01T00:00:00Z',

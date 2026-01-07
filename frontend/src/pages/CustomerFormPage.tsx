@@ -1,6 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCustomer, useCreateCustomer, useUpdateCustomer } from '@/hooks/useCustomers';
 import { CustomerForm } from '@/components/features/customers/CustomerForm';
+import { toast } from 'sonner';
+import { PageLoading } from '@/components/common/Skeletons';
 import type { CustomerFormData } from '@/types/customer';
 
 export function CustomerFormPage() {
@@ -15,21 +17,24 @@ export function CustomerFormPage() {
     const updateMutation = useUpdateCustomer();
 
     const handleSubmit = async (data: CustomerFormData) => {
-        try {
-            if (isEditMode && id) {
-                await updateMutation.mutateAsync({ id, data });
-                navigate(`/customers/${id}`);
-            } else {
-                const newCustomer = await createMutation.mutateAsync(data);
-                navigate(`/customers/${newCustomer.customer_id}`);
-            }
-        } catch (error) {
-            // Error handled in hook toast
-        }
+        const promise = isEditMode && id
+            ? updateMutation.mutateAsync({ id, data })
+            : createMutation.mutateAsync(data);
+
+        toast.promise(promise, {
+            loading: isEditMode ? 'Updating customer...' : 'Creating customer...',
+            success: (res) => {
+                navigate(`/customers/${res.customer_id}`);
+                return `Customer "${res.company_name}" ${isEditMode ? 'updated' : 'created'} successfully`;
+            },
+            error: (err) => {
+                const apiError = err.response?.data?.detail || err.message;
+                return `Failed to ${isEditMode ? 'update' : 'create'} customer: ${apiError}`;
+            },
+        });
     };
 
-    if (isEditMode && isLoadingCustomer) return <div>Loading...</div>;
-
+    if (isEditMode && isLoadingCustomer) return <PageLoading />;
     return (
         <div className="space-y-6 max-w-2xl mx-auto">
             <div>

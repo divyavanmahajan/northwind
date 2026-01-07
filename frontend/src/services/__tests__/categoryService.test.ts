@@ -13,7 +13,7 @@ vi.mock('@/lib/api', () => ({
 }));
 
 import api from '@/lib/api';
-const mockApi = vi.mocked(api);
+const mockApi = vi.mocked(api, true);
 
 describe('categoryService', () => {
     beforeEach(() => {

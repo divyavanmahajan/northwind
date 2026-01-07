@@ -22,7 +22,7 @@ def list_suppliers(
     country: Optional[str] = Query(None),
     city: Optional[str] = Query(None),
     sort_by: str = Query("company_name"),
-    sort_order: str = Query("asc", regex="^(asc|desc)$"),
+    sort_order: str = Query("asc", pattern="^(asc|desc)$"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):

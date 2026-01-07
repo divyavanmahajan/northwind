@@ -14,6 +14,8 @@ import { useEmployees } from '@/hooks/useEmployees';
 import { useProducts } from '@/hooks/useProducts';
 import { Plus, Trash2, ArrowLeft } from 'lucide-react';
 import type { StartOrderDetail } from '@/types/order';
+import { PageLoading } from '@/components/common/Skeletons';
+import { toast } from 'sonner';
 
 const orderSchema = z.object({
     customer_id: z.string().min(1, 'Customer is required'),
@@ -34,7 +36,7 @@ export function OrderFormPage() {
     const navigate = useNavigate();
     const isEdit = !!id;
 
-    const { data: order } = useOrder(parseInt(id!), { enabled: isEdit });
+    const { data: order } = useOrder(parseInt(id || '0'));
     const { data: customersData } = useCustomers({ page: 1, page_size: 100 });
     const { data: employeesData } = useEmployees({ page: 1, page_size: 100 });
     const { data: productsData } = useProducts({ page: 1, page_size: 100 });
@@ -48,7 +50,7 @@ export function OrderFormPage() {
 
     const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<OrderFormData>({
         resolver: zodResolver(orderSchema),
-        defaultValues: order || {},
+        values: order as any,
     });
 
     const onSubmit = async (data: OrderFormData) => {
@@ -57,13 +59,24 @@ export function OrderFormPage() {
             order_details: orderDetails.filter(d => d.product_id > 0),
         };
 
-        if (isEdit) {
-            await updateOrder.mutateAsync({ id: parseInt(id!), data: payload });
-        } else {
-            await createOrder.mutateAsync(payload);
-        }
-        navigate('/orders');
+        const promise = isEdit
+            ? updateOrder.mutateAsync({ id: parseInt(id!), data: payload })
+            : createOrder.mutateAsync(payload);
+
+        toast.promise(promise, {
+            loading: isEdit ? 'Updating order...' : 'Creating order...',
+            success: () => {
+                navigate('/orders');
+                return `Order ${isEdit ? 'updated' : 'created'} successfully`;
+            },
+            error: (err) => {
+                const apiError = err.response?.data?.detail || err.message;
+                return `Failed to ${isEdit ? 'update' : 'create'} order: ${apiError}`;
+            },
+        });
     };
+
+    if (isEdit && !order) return <PageLoading />;
 
     const addItem = () => {
         setOrderDetails([...orderDetails, { product_id: 0, quantity: 1, discount: 0 }]);

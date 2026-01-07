@@ -19,8 +19,8 @@ def list_categories(
     page: int = Query(1, ge=1),
     page_size: int = Query(25, ge=1, le=100),
     search: Optional[str] = Query(None, max_length=100),
-    sort_by: str = Query("category_name", regex="^(category_id|category_name|created_at)$"),
-    sort_order: str = Query("asc", regex="^(asc|desc)$"),
+    sort_by: str = Query("category_name", pattern="^(category_id|category_name|created_at)$"),
+    sort_order: str = Query("asc", pattern="^(asc|desc)$"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):

@@ -15,7 +15,7 @@ export function ProtectedRoute({
     permissions,
     fallback,
 }: ProtectedRouteProps) {
-    const { isAuthenticated, isLoading, user, hasRole, hasPermission } = useAuth();
+    const { isAuthenticated, isLoading, hasRole, hasPermission } = useAuth();
     const location = useLocation();
 
     // Show loading while checking auth

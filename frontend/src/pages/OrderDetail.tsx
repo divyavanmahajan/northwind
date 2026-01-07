@@ -7,22 +7,43 @@ import { OrderStatusSelect } from '@/components/features/orders/OrderStatusSelec
 import { RoleGate } from '@/components/auth/RoleGate';
 import { useOrder, useUpdateOrderStatus } from '@/hooks/useOrders';
 import { formatDate, formatCurrency } from '@/lib/utils';
-import { Printer, Pencil, ArrowLeft } from 'lucide-react';
+import { Printer, Pencil, ArrowLeft, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import { PageLoading } from '@/components/common/Skeletons';
+import { EmptyState } from '@/components/common/EmptyState';
 import type { OrderStatus } from '@/types/order';
 
 export function OrderDetail() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { data: order, isLoading } = useOrder(parseInt(id!));
+    const { data: order, isLoading, isError } = useOrder(parseInt(id!));
     const updateStatus = useUpdateOrderStatus();
 
-    if (isLoading) return <div className="p-6">Loading...</div>;
-    if (!order) return <div className="p-6">Order not found</div>;
+    if (isLoading) return <PageLoading />;
+    if (isError || !order) {
+        return (
+            <EmptyState
+                title="Order not found"
+                description="The order you are looking for might have been deleted or does not exist."
+                icon={AlertCircle}
+                action={{ label: "Back to Orders", onClick: () => navigate('/orders') }}
+            />
+        );
+    }
 
     const handleStatusChange = async (newStatus: string) => {
-        await updateStatus.mutateAsync({
+        const promise = updateStatus.mutateAsync({
             orderId: parseInt(id!),
             status: newStatus as OrderStatus,
+        });
+
+        toast.promise(promise, {
+            loading: 'Updating order status...',
+            success: `Order status updated to ${newStatus}`,
+            error: (err) => {
+                const apiError = err.response?.data?.detail || err.message;
+                return `Failed to update status: ${apiError}`;
+            },
         });
     };
 

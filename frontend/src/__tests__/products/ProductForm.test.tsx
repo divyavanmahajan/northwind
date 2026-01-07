@@ -1,14 +1,14 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ProductForm } from '@/components/features/products/ProductForm';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Polyfill ResizeObserver
-global.ResizeObserver = class ResizeObserver {
+vi.stubGlobal('ResizeObserver', class {
     observe() { }
     unobserve() { }
     disconnect() { }
-};
+});
 
 // Mock hook-form resovlers to avoid zod issues in tests if any, 
 // but actually we are testing with real resolver logic mostly.

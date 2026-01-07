@@ -12,7 +12,7 @@ vi.mock('@/store/authStore', () => ({
 }));
 
 vi.mock('@/hooks/useCustomers', () => ({
-    useCustomer: vi.fn((id) => ({
+    useCustomer: vi.fn(() => ({
         data: {
             customer_id: 'ALFKI',
             company_name: 'Alfreds Futterkiste',

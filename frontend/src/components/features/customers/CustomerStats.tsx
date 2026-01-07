@@ -12,32 +12,37 @@ export function CustomerStats({ statistics }: CustomerStatsProps) {
         return null;
     }
 
-    const stats = [
-        {
-            title: 'Total Orders',
-            value: statistics.total_orders,
-            icon: ShoppingCart,
-            format: (v: number) => v.toString(),
-        },
-        {
-            title: 'Total Spent',
-            value: statistics.total_spent,
-            icon: DollarSign,
-            format: formatCurrency,
-        },
-        {
-            title: 'Average Order',
-            value: statistics.average_order_value,
-            icon: TrendingUp,
-            format: formatCurrency,
-        },
-        {
-            title: 'Last Order',
-            value: statistics.last_order_date,
-            icon: Calendar,
-            format: (v: string | null) => v ? formatDate(v) : 'Never',
-        },
-    ];
+    const stats: Array<{
+        title: string;
+        value: any;
+        icon: any;
+        format: (v: any) => string;
+    }> = [
+            {
+                title: 'Total Orders',
+                value: statistics.total_orders,
+                icon: ShoppingCart,
+                format: (v: number) => v.toString(),
+            },
+            {
+                title: 'Total Spent',
+                value: statistics.total_spent,
+                icon: DollarSign,
+                format: formatCurrency,
+            },
+            {
+                title: 'Average Order',
+                value: statistics.average_order_value,
+                icon: TrendingUp,
+                format: formatCurrency,
+            },
+            {
+                title: 'Last Order',
+                value: statistics.last_order_date,
+                icon: Calendar,
+                format: (v: string | null) => v ? formatDate(v) : 'Never',
+            },
+        ];
 
     return (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

@@ -32,9 +32,9 @@ describe('DataTable', () => {
             key: 'status',
             header: 'Status',
             sortable: true,
-            render: (value) => (
-                <span className={value === 'active' ? 'text-green-600' : 'text-red-600'}>
-                    {value}
+            render: (item) => (
+                <span className={item.status === 'active' ? 'text-green-600' : 'text-red-600'}>
+                    {item.status}
                 </span>
             ),
         },
@@ -70,15 +70,14 @@ describe('DataTable', () => {
     });
 
     it('should show loading state', () => {
-        render(<DataTable columns={mockColumns} data={[]} isLoading={true} />);
-
-        expect(screen.getByText(/loading/i)).toBeInTheDocument();
+        const { container } = render(<DataTable columns={mockColumns} data={[]} isLoading={true} />);
+        expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
     });
 
     it('should show empty state when no data', () => {
         render(<DataTable columns={mockColumns} data={[]} />);
 
-        expect(screen.getByText(/no data available/i)).toBeInTheDocument();
+        expect(screen.getByText(/no results found/i)).toBeInTheDocument();
     });
 
     it('should show custom empty message', () => {
@@ -182,8 +181,6 @@ describe('DataTable', () => {
             <DataTable
                 columns={mockColumns}
                 data={mockData}
-                searchable={true}
-                searchValue=""
                 onSearch={mockOnSearch}
             />
         );
@@ -199,8 +196,6 @@ describe('DataTable', () => {
             <DataTable
                 columns={mockColumns}
                 data={mockData}
-                searchable={true}
-                searchValue=""
                 onSearch={mockOnSearch}
             />
         );

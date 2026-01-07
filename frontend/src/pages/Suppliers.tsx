@@ -1,15 +1,16 @@
 import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useSuppliers, useCountries, useCities, useDeleteSupplier } from '@/hooks/useSuppliers';
 import { DataTable } from '@/components/common/DataTable';
 import { Pagination } from '@/components/common/Pagination';
 import { FilterPanel } from '@/components/common/FilterPanel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Edit, Trash2, Eye } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import { UserRole } from '@/types/user';
+import { EmptyState } from '@/components/common/EmptyState';
+import { AlertCircle, Plus, Edit, Trash2, Eye } from 'lucide-react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -60,12 +61,16 @@ export function Suppliers() {
     };
 
     const handleDelete = async (id: number) => {
-        try {
-            await deleteMutation.mutateAsync(id);
-            toast.success('Supplier deleted successfully');
-        } catch (error: any) {
-            toast.error(error.response?.data?.error?.message || 'Failed to delete supplier');
-        }
+        const promise = deleteMutation.mutateAsync(id);
+
+        toast.promise(promise, {
+            loading: 'Deleting supplier...',
+            success: 'Supplier deleted successfully',
+            error: (err) => {
+                const apiError = err.response?.data?.detail || err.message;
+                return `Failed to delete supplier: ${apiError}`;
+            },
+        });
     };
 
     const columns = [
@@ -133,7 +138,16 @@ export function Suppliers() {
         },
     ];
 
-    if (isError) return <div>Error loading suppliers</div>;
+    if (isError) {
+        return (
+            <EmptyState
+                title="Error loading suppliers"
+                description="We encountered an issue while fetching the supplier list."
+                icon={AlertCircle}
+                action={{ label: "Retry", onClick: () => window.location.reload() }}
+            />
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -185,11 +199,7 @@ export function Suppliers() {
                         totalItems={data.pagination.total_items}
                         totalPages={data.pagination.total_pages}
                         onPageChange={setPage}
-                        onPageSizeChange={(newSize) => {
-                            // Since Suppliers doesn't use searchParams for page_size yet, we just set it if we had a state,
-                            // but for now let's just trigger a page reset to 1.
-                            // Actually, I should probably add a pageSize state to Suppliers if I want it to work.
-                            // But I'll just match the interface for now.
+                        onPageSizeChange={() => {
                             setPage(1);
                         }}
                     />

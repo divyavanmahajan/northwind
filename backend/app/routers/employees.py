@@ -45,7 +45,7 @@ def list_employees(
     city: Optional[str] = Query(None),
     country: Optional[str] = Query(None),
     sort_by: str = Query("last_name"),
-    sort_order: str = Query("asc", regex="^(asc|desc)$"),
+    sort_order: str = Query("asc", pattern="^(asc|desc)$"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):

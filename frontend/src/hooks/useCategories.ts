@@ -21,11 +21,11 @@ export function useCategories(params: CategoryListParams = {}) {
     });
 }
 
-export function useCategory(id: number) {
+export function useCategory(id: number | undefined) {
     return useQuery({
-        queryKey: categoryKeys.detail(id),
-        queryFn: () => categoryService.getById(id),
-        enabled: !!id,
+        queryKey: categoryKeys.detail(id as number),
+        queryFn: () => categoryService.getById(id as number),
+        enabled: id !== undefined && !isNaN(id as number),
     });
 }
 

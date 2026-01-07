@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSupplier, useDeleteSupplier } from '@/hooks/useSuppliers';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Edit, Trash2, ArrowLeft, Globe, Phone, Mail, MapPin } from 'lucide-react';
+import { Edit, Trash2, ArrowLeft, Globe, Phone, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import { UserRole } from '@/types/user';

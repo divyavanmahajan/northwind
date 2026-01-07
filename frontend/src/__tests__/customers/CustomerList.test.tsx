@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { Customers } from '@/pages/Customers';
 import { queryClient } from '@/lib/queryClient';
 import { describe, it, expect, vi } from 'vitest';
-import { UserRole } from '@/types/user';
+
 
 vi.mock('@/store/authStore', () => ({
     useAuthStore: () => ({

@@ -66,6 +66,7 @@ export function Pagination({
                         className="hidden h-8 w-8 p-0 lg:flex"
                         onClick={() => onPageChange(1)}
                         disabled={page === 1}
+                        aria-label="First page"
                     >
                         <ChevronsLeft className="h-4 w-4" />
                     </Button>
@@ -74,6 +75,7 @@ export function Pagination({
                         className="h-8 w-8 p-0"
                         onClick={() => onPageChange(page - 1)}
                         disabled={page === 1}
+                        aria-label="Previous page"
                     >
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
@@ -82,6 +84,7 @@ export function Pagination({
                         className="h-8 w-8 p-0"
                         onClick={() => onPageChange(page + 1)}
                         disabled={page === totalPages || totalPages === 0}
+                        aria-label="Next page"
                     >
                         <ChevronRight className="h-4 w-4" />
                     </Button>
@@ -90,6 +93,7 @@ export function Pagination({
                         className="hidden h-8 w-8 p-0 lg:flex"
                         onClick={() => onPageChange(totalPages)}
                         disabled={page === totalPages || totalPages === 0}
+                        aria-label="Last page"
                     >
                         <ChevronsRight className="h-4 w-4" />
                     </Button>

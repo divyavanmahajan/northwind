@@ -5,10 +5,11 @@ import { DataTable } from '@/components/common/DataTable';
 import { Pagination } from '@/components/common/Pagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Edit, Trash2, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 import { UserRole } from '@/types/user';
+import { EmptyState } from '@/components/common/EmptyState';
+import { AlertCircle, Edit, Trash2, Eye } from 'lucide-react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -64,12 +65,16 @@ export function EmployeesList() {
     );
 
     const handleDelete = async (id: number) => {
-        try {
-            await deleteEmployee.mutateAsync(id);
-            toast.success('Employee deleted successfully');
-        } catch (error: any) {
-            toast.error('Failed to delete employee');
-        }
+        const promise = deleteEmployee.mutateAsync(id);
+
+        toast.promise(promise, {
+            loading: 'Deleting employee...',
+            success: 'Employee deleted successfully',
+            error: (err) => {
+                const apiError = err.response?.data?.detail || err.message;
+                return `Failed to delete employee: ${apiError}`;
+            },
+        });
     };
 
     const columns = [
@@ -140,7 +145,16 @@ export function EmployeesList() {
         },
     ];
 
-    if (isError) return <div>Error loading employees</div>;
+    if (isError) {
+        return (
+            <EmptyState
+                title="Error loading employees"
+                description="We encountered an issue while fetching the employee list."
+                icon={AlertCircle}
+                action={{ label: "Retry", onClick: () => window.location.reload() }}
+            />
+        );
+    }
 
     return (
         <div className="space-y-4">
