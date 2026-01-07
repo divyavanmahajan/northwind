@@ -9,6 +9,8 @@ env/
 build/
 dist/
 *.egg-info/
+logs/
+.playwright-mcp/
 
 # Node.js
 node_modules/
