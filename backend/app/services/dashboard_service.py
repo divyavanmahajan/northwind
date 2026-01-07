@@ -23,17 +23,20 @@ class DashboardService:
     
     def _get_date_range(self, period: str) -> Tuple[date, date]:
         # Handle historical seed data by finding the latest order date
+        # Default to today if no orders exist
         latest_order = self.db.query(func.max(Order.order_date)).filter(Order.deleted_at.is_(None)).scalar()
         
-        # If no orders or if latest order is within the last year, use today
-        if not latest_order or latest_order > date.today() - timedelta(days=365):
+        if not latest_order:
             end = date.today()
         else:
-            # For demonstration with historical data, use the latest order date as 'today'
+            # Anchor to the latest order date
             end = latest_order
             
         days_map = {"7d": 7, "30d": 30, "90d": 90, "1y": 365}
         start = end - timedelta(days=days_map.get(period, 30))
+        
+        # Also ensure we don't go before the first order ever if possible, 
+        # though usually the period is the limiting factor.
         return start, end
     
     def get_sales_overview(self, start: date, end: date, customer_id: str = None) -> SalesMetric:
@@ -99,11 +102,17 @@ class DashboardService:
         )
     
     def get_revenue_trend(self, start: date, end: date) -> List[RevenueByPeriod]:
+        # Choose granularity based on range
+        days_diff = (end - start).days
+        is_daily = days_diff <= 31
+
         # Handle different date formatting based on dialect
         if self.db.bind.dialect.name == "postgresql":
-            period_func = func.to_char(Order.order_date, 'YYYY-MM')
+            fmt = 'YYYY-MM-DD' if is_daily else 'YYYY-MM'
+            period_func = func.to_char(Order.order_date, fmt)
         else:
-            period_func = func.strftime('%Y-%m', Order.order_date)
+            fmt = '%Y-%m-%d' if is_daily else '%Y-%m'
+            period_func = func.strftime(fmt, Order.order_date)
 
         results = self.db.query(
             period_func.label('period'),
