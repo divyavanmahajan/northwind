@@ -11,7 +11,7 @@ router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
 @router.get("/admin", response_model=AdminDashboard)
 def get_admin_dashboard(
-    period: str = Query("30d", pattern="^(7d|30d|90d|1y)$"),
+    period: str = Query("30d", pattern="^(7d|30d|90d|1y|all)$"),
     db: Session = Depends(get_db),
     current_user: User = Depends(require_roles([UserRole.ADMIN]))
 ):
@@ -21,7 +21,7 @@ def get_admin_dashboard(
 
 @router.get("/manager", response_model=ManagerDashboard)
 def get_manager_dashboard(
-    period: str = Query("30d", pattern="^(7d|30d|90d|1y)$"),
+    period: str = Query("30d", pattern="^(7d|30d|90d|1y|all)$"),
     db: Session = Depends(get_db),
     current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
 ):
@@ -40,7 +40,7 @@ def get_employee_dashboard(
 
 @router.get("/customer", response_model=CustomerDashboard)
 def get_customer_dashboard(
-    period: str = Query("30d", pattern="^(7d|30d|90d|1y)$"),
+    period: str = Query("30d", pattern="^(7d|30d|90d|1y|all)$"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
