@@ -84,14 +84,21 @@ export const useAuthStore = create<AuthState>()(
                 const { token } = get();
                 if (!token) return;
 
+                set({ isLoading: true });
                 try {
                     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                     const user = await authService.getMe();
                     const permData = await authService.getPermissions();
-                    set({ user, permissions: permData.permissions, isAuthenticated: true });
-                } catch {
-                    // Token invalid, logout
+                    set({
+                        user,
+                        permissions: permData.permissions,
+                        isAuthenticated: true,
+                        isLoading: false
+                    });
+                } catch (error) {
+                    // Token invalid or network error, logout
                     get().logout();
+                    set({ isLoading: false });
                 }
             },
 
@@ -104,6 +111,8 @@ export const useAuthStore = create<AuthState>()(
             partialize: (state) => ({
                 token: state.token,
                 user: state.user,
+                isAuthenticated: state.isAuthenticated,
+                permissions: state.permissions,
             }),
         }
     )
