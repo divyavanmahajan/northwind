@@ -34,7 +34,9 @@ class OrderService:
         page_size: int = 25,
         status: Optional[OrderStatus] = None,
         customer_id: Optional[str] = None,
-        product_id: Optional[int] = None
+        product_id: Optional[int] = None,
+        sort_by: str = "order_date",
+        sort_order: str = "desc"
     ) -> Tuple[List[Order], int]:
         query = self.db.query(Order).filter(Order.deleted_at.is_(None))
         query = self._apply_access_filter(query)
@@ -48,8 +50,15 @@ class OrderService:
         
         total = query.count()
         
-        # Order by date desc
-        query = query.order_by(desc(Order.order_date), desc(Order.order_id))
+        # Apply sorting
+        sort_column = getattr(Order, sort_by, Order.order_date)
+        if sort_order == "desc":
+            query = query.order_by(desc(sort_column))
+        else:
+            query = query.order_by(sort_column)
+        
+        # Add secondary sort by order_id for consistency
+        query = query.order_by(desc(Order.order_id))
         
         offset = (page - 1) * page_size
         orders = query.offset(offset).limit(page_size).all()
