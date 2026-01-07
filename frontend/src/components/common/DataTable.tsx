@@ -164,7 +164,7 @@ export function DataTable<T extends { [key: string]: any }>({
                                     ))}
                                     {actions && (
                                         <TableCell className="text-right pr-4" onClick={(e) => e.stopPropagation()}>
-                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end">
+                                            <div className="flex justify-end">
                                                 {actions(item)}
                                             </div>
                                         </TableCell>
