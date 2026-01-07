@@ -177,7 +177,7 @@ export function Categories() {
                     sortOrder={sortOrder}
                     onSearch={debouncedSearch}
                     searchPlaceholder="Search categories..."
-                    onRowClick={(cat) => navigate(`/categories/${cat.category_id}`)}
+                    onRowClick={(cat) => navigate(`/products?category_id=${cat.category_id}`)}
                     actions={(cat) => (
                         <RoleGate roles={['admin', 'manager']}>
                             <div className="flex justify-end gap-1">
