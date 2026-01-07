@@ -76,8 +76,6 @@ start_frontend() {
     
     # Kill any existing processes on common Vite ports
     kill_port 5173
-    kill_port 5174
-    kill_port 5175
     
     cd "$FRONTEND_DIR"
     
