@@ -29,15 +29,25 @@ export function Orders() {
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(25);
     const [statusFilter, setStatusFilter] = useState<OrderStatus | ''>('');
+    const [sortBy, setSortBy] = useState('order_date');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
     const [deletingOrderId, setDeletingOrderId] = useState<number | null>(null);
     const { data, isLoading, isError } = useOrders({
         page,
         page_size: pageSize,
-        status: statusFilter || undefined
+        status: statusFilter || undefined,
+        sort_by: sortBy,
+        sort_order: sortOrder
     });
     const deleteOrder = useDeleteOrder();
 
     const canManage = user?.role === 'admin' || user?.role === 'manager';
+
+    const handleSort = (key: string, order: 'asc' | 'desc') => {
+        setSortBy(key);
+        setSortOrder(order);
+        setPage(1); // Reset to first page when sorting changes
+    };
 
     const columns = useMemo(() => [
         {
@@ -137,6 +147,9 @@ export function Orders() {
                     columns={columns}
                     data={data?.data || []}
                     isLoading={isLoading}
+                    onSort={handleSort}
+                    sortBy={sortBy}
+                    sortOrder={sortOrder}
                     onRowClick={(order) => navigate(`/orders/${order.order_id}`)}
                     actions={canManage ? (order: OrderListResponse) => (
                         <div className="flex justify-end gap-1">

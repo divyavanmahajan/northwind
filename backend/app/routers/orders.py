@@ -22,6 +22,8 @@ def list_orders(
     status: Optional[OrderStatus] = Query(None),
     customer_id: Optional[str] = Query(None),
     product_id: Optional[int] = Query(None),
+    sort_by: str = Query("order_date", pattern="^(order_id|order_date|status|total)$"),
+    sort_order: str = Query("desc", pattern="^(asc|desc)$"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -31,7 +33,9 @@ def list_orders(
         page_size=page_size, 
         status=status,
         customer_id=customer_id,
-        product_id=product_id
+        product_id=product_id,
+        sort_by=sort_by,
+        sort_order=sort_order
     )
     
     return PaginatedResponse(
