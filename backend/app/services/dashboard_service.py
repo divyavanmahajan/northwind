@@ -22,6 +22,25 @@ class DashboardService:
         self.user = current_user
     
     def _get_date_range(self, period: str) -> Tuple[date, date]:
+        """
+        Get date range for dashboard queries.
+        
+        For 'all' period: Uses actual min/max order dates from database
+        For other periods: Anchors to latest order date and goes back by specified days
+        """
+        # Handle 'all' period - use actual date range from database
+        if period == "all":
+            date_range = self.db.query(
+                func.min(Order.order_date),
+                func.max(Order.order_date)
+            ).filter(Order.deleted_at.is_(None)).first()
+            
+            if not date_range or not date_range[0] or not date_range[1]:
+                # No orders exist, default to today
+                return date.today(), date.today()
+            
+            return date_range[0], date_range[1]
+        
         # Handle historical seed data by finding the latest order date
         # Default to today if no orders exist
         latest_order = self.db.query(func.max(Order.order_date)).filter(Order.deleted_at.is_(None)).scalar()
