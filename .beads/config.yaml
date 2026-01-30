@@ -52,6 +52,8 @@
 #     - ~/beads-planning  # Personal planning repo
 #     - ~/work-planning   # Work planning repo
 
+# Claude integration: intentionally not used (we use Cursor). Ignore "Claude Integration: Not configured" in bd doctor.
+
 # Integration settings (access with 'bd config get/set')
 # These are stored in the database, not in this file:
 # - jira.url

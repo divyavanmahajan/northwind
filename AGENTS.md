@@ -38,3 +38,6 @@ bd sync               # Sync with git
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
 
+## bd doctor warnings
+- **Claude Integration: Not configured** – Ignore. This project uses Cursor; Claude integration is intentionally not used (see `.beads/config.yaml`).
+
