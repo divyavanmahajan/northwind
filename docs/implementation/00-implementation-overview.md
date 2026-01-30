@@ -194,4 +194,6 @@ northwind-test/
 
 ---
 
+**Tracking**: Each implementation step is tracked as a bead. See [status/progress-implementation.md](./status/progress-implementation.md) for the step-to-bead mapping and status. Use `bd list` / `bd show <id>` to view in beads.
+
 **Next Step**: Begin with [Prompt 01: Project Setup & Docker Configuration](./01-project-setup.md)
