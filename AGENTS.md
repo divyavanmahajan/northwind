@@ -40,4 +40,5 @@ bd sync               # Sync with git
 
 ## bd doctor warnings
 - **Claude Integration: Not configured** – Ignore. This project uses Cursor; Claude integration is intentionally not used (see `.beads/config.yaml`).
+- **Sync Branch Config: sync-branch not configured** – Optional. Only needed for multi-clone setups. To enable: upgrade Git to ≥2.25 (for `sparse-checkout`), then run `bd migrate sync beads-sync`.
 
