@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy.sql import text
-from datetime import datetime
+from datetime import datetime, timezone
 from contextlib import asynccontextmanager
 import logging
 
@@ -75,7 +75,7 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
             "error": {
                 "code": code,
                 "message": str(exc.detail),
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "path": str(request.url.path)
             }
         }
@@ -90,7 +90,7 @@ async def app_exception_handler(request: Request, exc: AppException):
                 "code": exc.code,
                 "message": exc.message,
                 "details": exc.details,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "path": str(request.url.path)
             }
         }
@@ -114,7 +114,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
                 "code": "VALIDATION_ERROR",
                 "message": "Validation error",
                 "details": details,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "path": str(request.url.path)
             }
         }
@@ -129,7 +129,7 @@ async def generic_exception_handler(request: Request, exc: Exception):
             "error": {
                 "code": "INTERNAL_ERROR",
                 "message": "Internal server error" if not settings.DEBUG else str(exc),
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "path": str(request.url.path)
             }
         }

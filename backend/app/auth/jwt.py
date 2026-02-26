@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from jose import jwt, JWTError
 from uuid import UUID
@@ -20,16 +20,16 @@ def create_access_token(
 ) -> str:
     """Create a JWT access token."""
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(seconds=settings.JWT_EXPIRATION)
+        expire = datetime.now(timezone.utc) + timedelta(seconds=settings.JWT_EXPIRATION)
     
     payload = {
         "sub": str(user_id),
         "username": username,
         "role": role.value,
         "exp": expire,
-        "iat": datetime.utcnow(),
+        "iat": datetime.now(timezone.utc),
         "type": "access"
     }
     
@@ -47,7 +47,7 @@ def decode_token(token: str) -> Optional[TokenData]:
         user_id = UUID(payload.get("sub"))
         username = payload.get("username")
         role = UserRole(payload.get("role"))
-        exp = datetime.fromtimestamp(payload.get("exp"))
+        exp = datetime.fromtimestamp(payload.get("exp"), tz=timezone.utc)
         
         return TokenData(user_id, username, role, exp)
     except (JWTError, ValueError, KeyError):
@@ -55,4 +55,4 @@ def decode_token(token: str) -> Optional[TokenData]:
 
 def is_token_expired(token_data: TokenData) -> bool:
     """Check if token is expired."""
-    return datetime.utcnow() > token_data.exp
+    return datetime.now(timezone.utc) > token_data.exp

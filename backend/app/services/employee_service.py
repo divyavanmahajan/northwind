@@ -4,7 +4,7 @@ from typing import Optional, List, Tuple
 from app.models.employee import Employee
 from app.schemas.employee import EmployeeCreate, EmployeeUpdate, EmployeeStatistics
 from app.utils.exceptions import NotFoundError, ConflictError
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 class EmployeeService:
     def __init__(self, db: Session):
@@ -51,7 +51,7 @@ class EmployeeService:
         from app.models.order_detail import OrderDetail
         from decimal import Decimal
         
-        month_ago = datetime.utcnow() - timedelta(days=30)
+        month_ago = datetime.now(timezone.utc) - timedelta(days=30)
         
         # Total orders
         total = self.db.query(func.count(Order.order_id)).filter(
@@ -191,6 +191,6 @@ class EmployeeService:
                 "Reassign reports first."
             )
         
-        employee.deleted_at = datetime.utcnow()
+        employee.deleted_at = datetime.now(timezone.utc)
         self.db.commit()
         return True

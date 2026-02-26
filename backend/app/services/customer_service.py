@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func, or_
 from typing import Optional, List, Tuple
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 from app.models.customer import Customer
@@ -162,7 +162,7 @@ class CustomerService:
         # if customer.orders.filter_by(deleted_at=None).count() > 0:
         #    raise ConflictError("Cannot delete customer with active orders")
         
-        customer.deleted_at = datetime.utcnow()
+        customer.deleted_at = datetime.now(timezone.utc)
         self.db.commit()
         return True
 

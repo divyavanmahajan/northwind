@@ -4,7 +4,7 @@ from typing import Optional, List, Tuple
 from app.models.supplier import Supplier
 from app.schemas.supplier import SupplierCreate, SupplierUpdate
 from app.utils.exceptions import NotFoundError, ConflictError
-from datetime import datetime
+from datetime import datetime, timezone
 
 class SupplierService:
     def __init__(self, db: Session):
@@ -117,7 +117,7 @@ class SupplierService:
             # Handle case where Product model is not yet available
             pass
         
-        supplier.deleted_at = datetime.utcnow()
+        supplier.deleted_at = datetime.now(timezone.utc)
         self.db.commit()
         return True
     

@@ -7,7 +7,7 @@ from app.models.category import Category
 from app.models.supplier import Supplier
 from app.schemas.product import ProductCreate, ProductUpdate
 from app.utils.exceptions import NotFoundError, ConflictError
-from datetime import datetime
+from datetime import datetime, timezone
 
 class ProductService:
     def __init__(self, db: Session):
@@ -162,7 +162,7 @@ class ProductService:
         if not product:
             raise NotFoundError(f"Product {product_id} not found")
         
-        product.deleted_at = datetime.utcnow()
+        product.deleted_at = datetime.now(timezone.utc)
         self.db.commit()
         return True
     

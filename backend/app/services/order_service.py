@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc
 from typing import Optional, List, Tuple
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from app.models.order import Order, OrderStatus
 from app.models.order_detail import OrderDetail
 from app.models.user import User, UserRole
@@ -199,6 +199,6 @@ class OrderService:
         if not order:
              raise NotFoundError(f"Order {order_id} not found")
         
-        order.deleted_at = datetime.utcnow()
+        order.deleted_at = datetime.now(timezone.utc)
         self.db.commit()
         return True

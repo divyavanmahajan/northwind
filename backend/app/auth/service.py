@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from app.models.user import User
 from app.services.user_service import UserService
@@ -29,7 +29,7 @@ class AuthService:
             raise AuthenticationError("Account is deactivated")
         
         # Update last login
-        user.last_login = datetime.utcnow()
+        user.last_login = datetime.now(timezone.utc)
         self.db.commit()
         
         return user

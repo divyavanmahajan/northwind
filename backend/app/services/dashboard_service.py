@@ -326,7 +326,8 @@ class DashboardService:
                     total_orders=0,
                     total_revenue=Decimal(0),
                     average_order_value=Decimal(0),
-                    orders_change_percent=0
+                    orders_change_percent=0,
+                    revenue_change_percent=0
                 ),
                 order_status_breakdown=[],
                 recent_orders=[],
